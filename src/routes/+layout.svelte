@@ -79,7 +79,7 @@
 					<li><a href="/">Item 3</a></li>
 				</ul>
 			</div>
-			<a href="/" class="btn btn-ghost text-xl">daisyUI</a>
+			<a href="/" class="btn btn-ghost text-xl">SvelteKit SaaS Boilerplate</a>
 		</div>
 		<div class="navbar-center hidden lg:flex">
 			<ul class="menu menu-horizontal px-1">
