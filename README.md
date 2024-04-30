@@ -31,6 +31,6 @@ This application is designed to run on [Netlify](https://www.netlify.com/) and u
 
 The application is written in Typescript using the [SvelteKit](https://kit.svelte.dev/) framework.
 
-For styling, the application uses [Tailwind CSS](https://tailwindcss.com/) with the [DaisyUI](https://daisyui.com/) component library.
+For styling, the application uses [Tailwind CSS](https://tailwindcss.com/) with the [DaisyUI](https://daisyui.com/) component library and [HyperUI](https://www.hyperui.dev/).
 
 In its current configuration, the application can be easily linked to Netlify via git for CI/CD, enabling automatic deployments on push to the main branch.
