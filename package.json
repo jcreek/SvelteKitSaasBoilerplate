@@ -42,7 +42,8 @@
 	"type": "module",
 	"dependencies": {
 		"@supabase/ssr": "^0.1.0",
-		"@supabase/supabase-js": "^2.42.0"
+		"@supabase/supabase-js": "^2.42.0",
+		"stripe": "^15.4.0"
 	},
 	"engines": {
 		"node": ">=18.13.0"
