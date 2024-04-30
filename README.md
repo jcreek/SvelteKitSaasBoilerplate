@@ -33,4 +33,6 @@ The application is written in Typescript using the [SvelteKit](https://kit.svelt
 
 For styling, the application uses [Tailwind CSS](https://tailwindcss.com/) with the [DaisyUI](https://daisyui.com/) component library and [HyperUI](https://www.hyperui.dev/).
 
+For taking payments the Stripe Checkout is used.
+
 In its current configuration, the application can be easily linked to Netlify via git for CI/CD, enabling automatic deployments on push to the main branch.
