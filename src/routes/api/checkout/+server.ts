@@ -26,5 +26,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		cancel_url: `${request.headers.get('origin')}/checkout/cancelled`
 	});
 
+	// TODO - Store the checkout session.id for access from the frontend
+	// https://docs.stripe.com/api/checkout/sessions/retrieve
+
 	return redirect(303, session.url as string);
 };
