@@ -36,3 +36,9 @@ For styling, the application uses [Tailwind CSS](https://tailwindcss.com/) with 
 For taking payments the Stripe Checkout is used.
 
 In its current configuration, the application can be easily linked to Netlify via git for CI/CD, enabling automatic deployments on push to the main branch.
+
+## To Do
+
+- Style product page
+- Enable proper pagination for the products page
+- Get a proper checkout page with data from Stripe rather than re-using the old basket object
