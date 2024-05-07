@@ -2,20 +2,13 @@
 	import 'tailwindcss/tailwind.css';
 	import { onDestroy, onMount } from 'svelte';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
-	import { user } from '$lib/stores/user.js';
-	import { type User } from '@supabase/auth-js';
+	import { invalidate } from '$app/navigation';
 	import SignIn from '$lib/components/SignIn.svelte';
 	import SignOut from '$lib/components/SignOut.svelte';
 
 	export let data;
-	let { supabase } = data;
-	$: ({ supabase } = data);
-
-	let localUser = null as User | null;
-	const unsubscribe = user.subscribe((value) => {
-		localUser = value;
-	});
-	onDestroy(unsubscribe);
+	let { supabase, session } = data
+	$: ({ supabase, session } = data)
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
@@ -23,24 +16,16 @@
 	});
 	onDestroy(unsubscribeToBasket);
 
-	onMount(async () => {
-		await getUser();
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+				if (_session?.expires_at !== session?.expires_at) {
+					// tells SvelteKit that the root +layout.ts load function should be executed whenever the session updates to keep the page store in sync.
+					invalidate('supabase:auth')
+				}
+			})
+
+			return () => data.subscription.unsubscribe()
 	});
-
-	async function getUser() {
-		const {
-			data: { session }
-		} = await supabase.auth.getSession();
-
-		if (session) {
-			localUser = session.user;
-		} else {
-			localUser = null;
-		}
-
-		// Update the store so that user is available to all components
-		user.set(localUser);
-	}
 </script>
 
 <svelte:head>
@@ -125,9 +110,9 @@
 			<div class="dropdown dropdown-end">
 				<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
 					<div class="w-10 rounded-full">
-						{#if localUser}
+						{#if session?.user}
 							<div class="user-circle text-primary-content border-primary-content">
-								{localUser.email[0].toUpperCase()}
+								{session?.user.email[0].toUpperCase()}
 							</div>
 						{:else}
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -141,7 +126,7 @@
 					</div>
 				</div>
 
-				{#if localUser}
+				{#if session?.user}
 					<ul
 						tabindex="-1"
 						class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box min-w-[13rem] w-auto"

@@ -1,18 +1,11 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import { user } from '$lib/stores/user.js';
 	import { type User } from '@supabase/auth-js';
 	import SignUp from '$lib/components/SignUp.svelte';
 
 	export let data;
-	let { supabase } = data;
-	$: ({ supabase } = data);
-
-	let localUser: User | null;
-	const unsubscribe = user.subscribe((value) => {
-		localUser = value;
-	});
-	onDestroy(unsubscribe);
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
 </script>
 
 <div class="hero bg-base-100 my-36">
