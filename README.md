@@ -44,3 +44,4 @@ In its current configuration, the application can be easily linked to Netlify vi
 - Ensure navbar dropdown closes when a link is clicked
 - Ensure navbar dropdown closes when anything else is clicked
 - Add forgot password functionality
+- Add toast for when adding an item to basket or removing one from basket
