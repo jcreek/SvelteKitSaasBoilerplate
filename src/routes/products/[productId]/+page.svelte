@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
+	import { general } from '$lib/stores/generalStore.js';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -9,7 +10,10 @@
 	const unsubscribeToBasket = basket.subscribe((value) => {
 		localBasket = value;
 	});
-	onDestroy(unsubscribeToBasket);
+
+	onDestroy(() => {
+		unsubscribeToBasket();
+	});
 
 	function addToBasket() {
 		basket.update((value) => {
@@ -28,6 +32,16 @@
 				};
 			}
 		});
+
+		general.update((value) => {
+			return { ...value, hideToast: false };
+		});
+
+		setTimeout(() => {
+			general.update((value) => {
+				return { ...value, hideToast: true };
+			});
+		}, 5000);
 	}
 
 	let item = {};

@@ -2,29 +2,38 @@
 	import 'tailwindcss/tailwind.css';
 	import { onDestroy, onMount } from 'svelte';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
+	import { general } from '$lib/stores/generalStore.js';
 	import { invalidate } from '$app/navigation';
 	import SignIn from '$lib/components/SignIn.svelte';
 	import SignOut from '$lib/components/SignOut.svelte';
 
 	export let data;
-	let { supabase, session } = data
-	$: ({ supabase, session } = data)
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
 		localBasket = value;
 	});
-	onDestroy(unsubscribeToBasket);
+
+	let localGeneral: any;
+	const unsubscribeToGeneralStore = general.subscribe((value) => {
+		localGeneral = value;
+	});
+	onDestroy(() => {
+		unsubscribeToBasket();
+		unsubscribeToGeneralStore();
+	});
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
-				if (_session?.expires_at !== session?.expires_at) {
-					// tells SvelteKit that the root +layout.ts load function should be executed whenever the session updates to keep the page store in sync.
-					invalidate('supabase:auth')
-				}
-			})
+			if (_session?.expires_at !== session?.expires_at) {
+				// tells SvelteKit that the root +layout.ts load function should be executed whenever the session updates to keep the page store in sync.
+				invalidate('supabase:auth');
+			}
+		});
 
-			return () => data.subscription.unsubscribe()
+		return () => data.subscription.unsubscribe();
 	});
 </script>
 
@@ -209,6 +218,27 @@
 		</a>
 	</nav>
 </footer>
+<div
+	id="success-toast"
+	role="alert"
+	class="alert alert-success fixed top-20 right-3 max-w-52 text-white {localGeneral.hideToast
+		? 'hidden'
+		: ''}"
+>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		class="stroke-current shrink-0 h-6 w-6"
+		fill="none"
+		viewBox="0 0 24 24"
+		><path
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="2"
+			d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+		/></svg
+	>
+	<span>Added to basket</span>
+</div>
 
 <style scoped>
 	.user-circle {
