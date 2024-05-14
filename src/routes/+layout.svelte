@@ -135,13 +135,13 @@
 							<a href="/profile"> Profile </a>
 						</li>
 						<li><a href="/settings">Settings</a></li>
-						<li><SignOut {supabase} on:signedOut={getUser} /></li>
+						<li><SignOut {supabase} /></li>
 					</ul>
 				{:else}
 					<div
 						class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box min-w-[13rem] w-auto"
 					>
-						<SignIn {supabase} on:signedIn={getUser} />
+						<SignIn {supabase} />
 					</div>
 				{/if}
 			</div>
