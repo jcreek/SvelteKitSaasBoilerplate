@@ -39,10 +39,4 @@ In its current configuration, the application can be easily linked to Netlify vi
 
 ## To Do
 
-- Enable proper pagination for the products page
-- Get a proper checkout page with data from Stripe rather than re-using the old basket object
-- Ensure navbar dropdown closes when a link is clicked
-- Ensure navbar dropdown closes when anything else is clicked
-- Add forgot password functionality
-- Add toast for when adding an item to basket or removing one from basket
-- Add proper cookie consent that is GDPR compliant
+Please see the Issues tab for `enhancement` tagged issues.
