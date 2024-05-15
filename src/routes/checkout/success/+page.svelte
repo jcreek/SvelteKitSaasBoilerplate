@@ -11,11 +11,7 @@
 		localBasket = value;
 	});
 
-	let { 
-		checkoutSession,
-		lineItems,
-		paymentStatus
-	} = data;
+	let { checkoutSession, lineItems, paymentStatus } = data;
 
 	onDestroy(unsubscribe);
 
@@ -76,7 +72,7 @@
 					{#each lineItems as item (item.id)}
 						<OrderConfirmationItem
 							itemName={item.description}
-							price={item.amount_total / 100}
+							price={item.price.unit_amount / 100}
 							quantity={item.quantity}
 							currency={item.currency}
 						/>
@@ -89,7 +85,12 @@
 				<div class="flex flex-col sm:flex-row items-center max-lg:border-b border-gray-200"></div>
 				<p class="font-semibold text-lg text-black py-6">
 					{#if checkoutSession?.amount_total != null}
-						Total Price: <span class="text-indigo-600"> {formatCurrency(checkoutSession?.amount_total / 100, checkoutSession?.currency ?? 'gbp')}</span>
+						Total Price: <span class="text-indigo-600">
+							{formatCurrency(
+								checkoutSession?.amount_total / 100,
+								checkoutSession?.currency ?? 'gbp'
+							)}</span
+						>
 					{/if}
 				</p>
 			</div>

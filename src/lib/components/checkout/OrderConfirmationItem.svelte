@@ -30,7 +30,7 @@
 				<h6
 					class="font-medium text-lg leading-8 text-indigo-600 max-[550px]:text-center pr-4 mr-4 border-r border-gray-200"
 				>
-					{ formatCurrency(price, currency) }
+					{formatCurrency(price, currency)}
 				</h6>
 				<p class="font-medium text-base leading-7 text-black">
 					Qty: <span class="text-gray-500">{quantity}</span>
@@ -45,7 +45,7 @@
 		<h6
 			class="text-indigo-600 font-manrope font-bold text-2xl leading-9 w-full max-w-[176px] text-center"
 		>
-			{ formatCurrency(price, currency) }
+			{formatCurrency(price * quantity, currency)}
 		</h6>
 	</div>
 </div>
