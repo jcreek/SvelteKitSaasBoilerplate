@@ -2,19 +2,27 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 	import OrderConfirmationItem from '$lib/components/checkout/OrderConfirmationItem.svelte';
+	import { formatCurrency } from '$lib/utils/currency';
+	import type { PageData } from './$types';
 
-	let orderConfirmationBasket: Basket;
+	export let data: PageData;
 	let localBasket: Basket;
 	const unsubscribe = basket.subscribe((value) => {
 		localBasket = value;
 	});
+
+	let { 
+		checkoutSession,
+		lineItems,
+		paymentStatus
+	} = data;
+
 	onDestroy(unsubscribe);
 
 	onMount(() => {
 		calculateSubtotal();
 
-		// Create a deep copy of the basket to store the order confirmation then clear the basket
-		orderConfirmationBasket = JSON.parse(JSON.stringify(localBasket));
+		// Clear the basket
 		localBasket = { items: [], subtotal: 0 };
 		basket.set(localBasket);
 		unsubscribe();
@@ -60,19 +68,17 @@
 				>
 			</div> -->
 			<div class="w-full px-3 min-[400px]:px-6">
-				{#if orderConfirmationBasket == undefined}
+				{#if lineItems.length == 0}
 					<p class="font-semibold text-lg leading-7 text-black text-center">
 						No items in the basket
 					</p>
 				{:else}
-					{#each orderConfirmationBasket.items as item (item.id)}
+					{#each lineItems as item (item.id)}
 						<OrderConfirmationItem
-							itemCategoryDescription={item.categoryDescription}
-							itemName={item.name}
-							imgAlt={item.imgAlt}
-							imgSrc={item.imgSrc}
-							price={item.price}
+							itemName={item.description}
+							price={item.amount_total / 100}
 							quantity={item.quantity}
+							currency={item.currency}
 						/>
 					{/each}
 				{/if}
@@ -82,7 +88,9 @@
 			>
 				<div class="flex flex-col sm:flex-row items-center max-lg:border-b border-gray-200"></div>
 				<p class="font-semibold text-lg text-black py-6">
-					Total Price: <span class="text-indigo-600"> $xx.xx</span>
+					{#if checkoutSession?.amount_total != null}
+						Total Price: <span class="text-indigo-600"> {formatCurrency(checkoutSession?.amount_total / 100, checkoutSession?.currency ?? 'gbp')}</span>
+					{/if}
 				</p>
 			</div>
 		</div>
