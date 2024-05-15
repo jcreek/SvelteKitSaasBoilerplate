@@ -5,7 +5,7 @@ import stripe from 'stripe';
 const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
 
 // Create a checkout session
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
 	const formData = new URLSearchParams(await request.text());
 	const items: { priceId: string; quantity: number }[] = [];
 
@@ -26,8 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		cancel_url: `${request.headers.get('origin')}/checkout/cancelled`
 	});
 
-	// TODO - Store the checkout session.id for access from the frontend
-	// https://docs.stripe.com/api/checkout/sessions/retrieve
-
+	// Store the checkout session.id for access from the frontend
+	cookies.set('checkout_session_id', session.id, { path: '/' });
 	return redirect(303, session.url as string);
 };
