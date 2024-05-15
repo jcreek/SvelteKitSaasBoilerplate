@@ -1,11 +1,13 @@
 <script lang="ts">
 	import 'tailwindcss/tailwind.css';
 	import { onDestroy, onMount } from 'svelte';
+	import { isBrowser } from '@supabase/ssr';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 	import { general } from '$lib/stores/generalStore.js';
 	import { invalidate } from '$app/navigation';
 	import SignIn from '$lib/components/SignIn.svelte';
 	import SignOut from '$lib/components/SignOut.svelte';
+	import CookieConsent from '$lib/components/CookieConsent.svelte';
 
 	export let data;
 	let { supabase, session } = data;
@@ -20,10 +22,13 @@
 	const unsubscribeToGeneralStore = general.subscribe((value) => {
 		localGeneral = value;
 	});
+
 	onDestroy(() => {
 		unsubscribeToBasket();
 		unsubscribeToGeneralStore();
 	});
+
+	let cookiesAccepted = false;
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
@@ -32,6 +37,12 @@
 				invalidate('supabase:auth');
 			}
 		});
+
+		if (isBrowser()) {
+			if (localStorage.getItem('cookiesAccepted')) {
+				cookiesAccepted = true;
+			}
+		}
 
 		return () => data.subscription.unsubscribe();
 	});
@@ -44,6 +55,10 @@
 	<meta property="og:description" content="" />
 	<link rel="canonical" href="" />
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+	{#if cookiesAccepted}
+		<!-- Google Analytics script goes here -->
+	{/if}
 </svelte:head>
 
 <header>
@@ -162,6 +177,8 @@
 	<slot />
 </main>
 
+<CookieConsent {cookiesAccepted} />
+
 <footer class="footer items-center p-4 bg-neutral text-neutral-content">
 	<aside class="items-center grid-flow-col">
 		<svg
@@ -218,6 +235,7 @@
 		</a>
 	</nav>
 </footer>
+
 <div
 	id="success-toast"
 	role="alert"
