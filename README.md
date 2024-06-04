@@ -17,6 +17,58 @@ npm run dev -- --open
 
 An example `.env` file is provided in the repository. You will need to copy `.env.example` to `.env` and fill in the values with your own credentials.
 
+### Local DB Development
+
+Ensure you have [Docker](https://docs.docker.com/get-docker/) installed on your development machine.
+
+You can start and stop the local DB environment with:
+
+```bash
+npx supabase start
+
+npx supabase stop
+```
+
+#### Migrations
+
+There are two options to create a migration file:
+
+1. [Writing the SQL manually](https://supabase.com/docs/guides/cli/local-development#database-migrations)
+
+    - Create new blank migration file
+
+      ```bash
+      npx supabase migration new <migration_name>
+      ```
+
+    - Add the SQL you want to deploy as part of the migration e.g.
+
+      ```sql
+      create table
+      employees (
+      id bigint primary key generated always as identity,
+      name text,
+      email text,
+      created_at timestamptz default now()
+      );
+      ```
+
+    - Reset the DB and apply the latest migrations
+
+      ```bash
+      supabase db reset
+      ```
+
+2. [Generate SQL based on differences to the schema](https://supabase.com/docs/guides/cli/local-development#diffing-changes)
+
+   - With the local DB running, enter the studio and make your changes to the schema
+
+   - Generate the migration file containing the SQL with the differences in the schema
+
+      ```bash
+      npx supabase db diff -f <migration_name>
+      ```
+
 ## Building
 
 To create a production version:
