@@ -4,7 +4,13 @@
 
 <li><a href="/products">Products</a></li>
 <li class={isMobile ? '' : 'dropdown'}>
-	<div tabindex="0" role="button" class="">Parent</div>
+	{#if isMobile}
+		<div tabindex="0" role="button" class="">Parent</div>
+	{:else}
+		<details>
+			<summary>Parent</summary>
+		</details>
+	{/if}
 	<ul
 		class="{isMobile
 			? ''
