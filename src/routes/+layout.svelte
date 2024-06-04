@@ -8,6 +8,7 @@
 	import SignIn from '$lib/components/SignIn.svelte';
 	import SignOut from '$lib/components/SignOut.svelte';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
+	import NavLinks from '$lib/components/NavLinks.svelte';
 
 	export let data;
 	let { supabase, session } = data;
@@ -62,7 +63,7 @@
 </svelte:head>
 
 <header>
-	<div class="navbar bg-primary text-primary-content">
+	<nav class="navbar bg-primary text-primary-content">
 		<div class="navbar-start">
 			<div class="dropdown">
 				<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -83,33 +84,14 @@
 				<ul
 					class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 text-base-content rounded-box w-52"
 				>
-					<li><a href="/products">Products</a></li>
-					<li>
-						<!-- svelte-ignore a11y-missing-attribute -->
-						<a>Parent</a>
-						<ul class="p-2">
-							<li><a href="/">Submenu 1</a></li>
-							<li><a href="/">Submenu 2</a></li>
-						</ul>
-					</li>
-					<li><a href="/">Item 3</a></li>
+					<NavLinks isMobile={true} />
 				</ul>
 			</div>
 			<a href="/" class="btn btn-ghost text-xl">SvelteKit SaaS Boilerplate</a>
 		</div>
 		<div class="navbar-center hidden lg:flex">
 			<ul class="menu menu-horizontal px-1">
-				<li><a href="/products">Products</a></li>
-				<li>
-					<details>
-						<summary>Parent</summary>
-						<ul class="p-2 text-base-content">
-							<li><a href="/">Submenu 1</a></li>
-							<li><a href="/">Submenu 2</a></li>
-						</ul>
-					</details>
-				</li>
-				<li><a href="/">Item 3</a></li>
+				<NavLinks isMobile={false} />
 			</ul>
 		</div>
 		<div class="navbar-end">
@@ -170,7 +152,7 @@
 				{/if}
 			</div>
 		</div>
-	</div>
+	</nav>
 </header>
 
 <main>
