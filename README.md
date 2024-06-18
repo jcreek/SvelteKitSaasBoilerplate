@@ -2,6 +2,8 @@
 
 A SvelteKit boilerplate project for a Software As A Service (SaaS) application, to get you started quickly.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/70e20d6a-2d2c-4a5b-b697-8053c1e8655b/deploy-status)](https://app.netlify.com/sites/sveltekitsaasboilerplate/deploys)
+
 ## Developing
 
 After you have cloned the repository you can install the dependencies with `npm install`, and start a development server:
