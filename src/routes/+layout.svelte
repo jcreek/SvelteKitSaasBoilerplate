@@ -55,7 +55,7 @@
 	<meta property="og:url" content="" />
 	<meta property="og:description" content="" />
 	<link rel="canonical" href="" />
-	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	<!-- <link rel="apple-touch-icon" href="/apple-touch-icon.png" /> -->
 
 	{#if cookiesAccepted}
 		<!-- Google Analytics script goes here -->
