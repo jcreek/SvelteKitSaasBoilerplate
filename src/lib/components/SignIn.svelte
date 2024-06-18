@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	import { general } from '$lib/stores/generalStore.js';
+
 	const dispatch = createEventDispatcher();
 
 	function emitSignedInEvent() {
@@ -22,6 +24,59 @@
 			.then(() => {
 				emitSignedInEvent();
 			});
+	}
+
+	async function forgotPassword() {
+		if (email === '') {
+			general.update((value) => {
+				return {
+					...value,
+					hideToast: false,
+					toastMessage: 'Please enter your email address',
+					toastType: 'error'
+				};
+			});
+
+			setTimeout(() => {
+				general.update((value) => {
+					return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
+				});
+			}, 5000);
+
+			return;
+		}
+
+		const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: 'https://example.com/auth/update-password'
+		});
+
+		if (error) {
+			console.error('Error sending password reset email:', error.message);
+			general.update((value) => {
+				return {
+					...value,
+					hideToast: false,
+					toastMessage: 'Error sending password reset email. Please try again.',
+					toastType: 'error'
+				};
+			});
+		} else {
+			console.log('Password reset email sent:', data);
+			general.update((value) => {
+				return {
+					...value,
+					hideToast: false,
+					toastMessage: 'Password reset email sent. Please check your inbox.',
+					toastType: 'success'
+				};
+			});
+		}
+
+		setTimeout(() => {
+			general.update((value) => {
+				return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
+			});
+		}, 5000);
 	}
 </script>
 
@@ -60,9 +115,9 @@
 			</label>
 		</div>
 		<div class="form-control">
-			<a href="/" id="forgot-password" class="label-text-alt link link-hover">
+			<button id="forgot-password" class="label-text-alt link link-hover" on:click={forgotPassword}>
 				Forgot your password?
-			</a>
+			</button>
 		</div>
 		<div class="form-control mt-2">
 			<button class="btn btn-primary" on:click={signInWithEmail}>Sign In</button>
