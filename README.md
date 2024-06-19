@@ -29,6 +29,26 @@ npx supabase start
 npx supabase stop
 ```
 
+#### Generate schema types (Typescript)
+
+`npx supabase gen types typescript --local > ./src/lib/db_schema.ts`
+
+The overarching `Database` type is used for a generic `SupabaseClient`. This is set globally in `src/app.d.ts`
+
+```ts
+import { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from '$lib/db_schema'
+
+declare global {
+  namespace App {
+    interface Locals {
+      supabase: SupabaseClient<Database>
+      ...
+    }
+  }
+}
+```
+
 #### Migrations
 
 There are two options to create a migration file:
