@@ -32,8 +32,8 @@
 	let cookiesAccepted = false;
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
+		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
 				// tells SvelteKit that the root +layout.ts load function should be executed whenever the session updates to keep the page store in sync.
 				invalidate('supabase:auth');
 			}
