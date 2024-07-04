@@ -42,3 +42,7 @@ In its current configuration, the application can be easily linked to Netlify vi
 ## To Do
 
 Please see the Issues tab for `enhancement` tagged issues.
+
+## [Database setup](/docs/database-setup.md)
+
+## [Stripe webhook event listening](/docs/stripe-setup.md)
