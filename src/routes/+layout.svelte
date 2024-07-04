@@ -138,7 +138,7 @@
 						class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box min-w-[13rem] w-auto"
 					>
 						<li>
-							<a href="/profile"> Profile </a>
+							<a href="/account"> Account </a>
 						</li>
 						<li><a href="/settings">Settings</a></li>
 						<li><SignOut {supabase} /></li>

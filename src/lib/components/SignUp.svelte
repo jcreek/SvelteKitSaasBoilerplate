@@ -17,7 +17,7 @@
 				password: password,
 				options: {
 					// Redirect URL after successful sign-up
-					redirectTo: '/profile'
+					redirectTo: '/account'
 				}
 			});
 
