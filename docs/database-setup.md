@@ -163,3 +163,17 @@ drop publication if exists supabase_realtime;
 create publication supabase_realtime
   for table products, prices;
 ```
+
+To get the types for the tables, you can follow these instructions taken from [here](https://supabase.com/docs/guides/api/rest/generating-types#generating-types-using-supabase-cli):
+
+`npm i supabase@">=1.8.1" --save-dev`
+
+`npx supabase login`
+
+`npx supabase init`
+
+Replace `$PROJECT_REF` with your project reference:
+`npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > types/supabase.ts`
+
+Replace `types/supabase.d.ts` with whatever file you want your types in:
+`npx supabase gen types typescript --local > types/supabase.d.ts`
