@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			}
 			default:
-				throw new Error(`Unhandled event type ${event.type}`);
+				console.error(`Unhandled event type ${event.type}`);
 		}
 
 		// Return a response to acknowledge receipt of the event
