@@ -1,9 +1,14 @@
 <script lang="ts">
+	import stripe from 'stripe';
+	import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
+
 	let email = '';
 	let password = '';
 
 	// Access the supabase client from the layout data
 	export let supabase: any;
+
+	const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
 
 	async function signUpNewUser() {
 		try {
@@ -12,13 +17,28 @@
 				password: password,
 				options: {
 					// Redirect URL after successful sign-up
-					redirectTo: '/welcome'
+					redirectTo: '/account'
 				}
 			});
 
 			if (error) {
 				throw error;
 			}
+
+			const customer = await stripeClient.customers.create({
+				email
+			});
+
+			const response = await supabase
+				.from('user')
+				.update({
+					customer_id: customer.id
+				})
+				.match({
+					id: data.user.id
+				});
+
+			console.log(response);
 
 			// Handle success (optional)
 		} catch (error: any) {

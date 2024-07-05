@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { type User } from '@supabase/auth-js';
 	import SignUp from '$lib/components/SignUp.svelte';
 
 	export let data;

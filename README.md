@@ -41,4 +41,10 @@ In its current configuration, the application can be easily linked to Netlify vi
 
 ## To Do
 
+- [Update types automatically](https://supabase.com/docs/guides/api/rest/generating-types#update-types-automatically-with-github-actions)
+
 Please see the Issues tab for `enhancement` tagged issues.
+
+## [Database setup](/docs/database-setup.md)
+
+## [Stripe webhook event listening](/docs/stripe-setup.md)
