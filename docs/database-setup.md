@@ -220,7 +220,7 @@ There are two options to create a migration file:
 
    - Reset the DB and apply the latest migrations
 
-     `supabase db reset`
+     `npx supabase db reset`
 
 2. [Generate SQL based on differences to the schema](https://supabase.com/docs/guides/cli/local-development#diffing-changes)
 
@@ -229,3 +229,11 @@ There are two options to create a migration file:
    - Generate the migration file containing the SQL with the differences in the schema
 
      `npx supabase db diff -f <migration_name>`
+
+## Applying migrations
+
+Reset database in cloud
+
+> Prerequisite login using `npx supabase login`
+
+`npx supabase db reset --linked`
