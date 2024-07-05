@@ -82,10 +82,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Return a response to acknowledge receipt of the event
-		return {
-			status: 200,
-			body: { received: true }
-		};
+		return new Response(JSON.stringify({ received: true }), {
+			status: 200
+		});
 	} catch (err) {
 		console.log(`Webhook Error: ${err.message}`);
 		return {
