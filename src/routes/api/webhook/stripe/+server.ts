@@ -3,6 +3,7 @@ import stripe from 'stripe';
 import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
 import { PUBLIC_STRIPE_ENDPOINT_SECRET } from '$env/static/public';
 import {
+	createOrRetrieveCustomer,
 	deletePriceRecord,
 	deleteProductRecord,
 	manageSubscriptionStatusChange,
@@ -53,6 +54,9 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			case 'product.deleted':
 				await deleteProductRecord(event.data.object as stripe.Product);
+				break;
+			case 'customer.created':
+				await createOrRetrieveCustomer(event.data.object as stripe.Customer);
 				break;
 			case 'customer.subscription.created':
 			case 'customer.subscription.updated':
