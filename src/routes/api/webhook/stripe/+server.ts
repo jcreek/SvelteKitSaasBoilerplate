@@ -56,7 +56,9 @@ export const POST: RequestHandler = async ({ request }) => {
 				await deleteProductRecord(event.data.object as stripe.Product);
 				break;
 			case 'customer.created':
-				await createOrRetrieveCustomer(event.data.object as stripe.Customer);
+			case 'customer.updated':
+				console.log(event.data.object);
+				await createOrRetrieveCustomer(event.data.object);
 				break;
 			case 'customer.subscription.created':
 			case 'customer.subscription.updated':
