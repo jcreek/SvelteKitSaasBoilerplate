@@ -277,4 +277,8 @@
 		align-items: center;
 		font-size: 20px; /* Adjust font size as needed */
 	}
+
+	main {
+		min-height: calc(100dvh - 68px - 68px);
+	}
 </style>
