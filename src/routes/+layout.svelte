@@ -1,5 +1,5 @@
 <script lang="ts">
-	import 'tailwindcss/tailwind.css';
+	import '../app.postcss';
 	import { onDestroy, onMount } from 'svelte';
 	import { isBrowser } from '@supabase/ssr';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
@@ -265,7 +265,7 @@
 	<span>{localGeneral.toastMessage == '' ? 'Added to basket' : localGeneral.toastMessage}</span>
 </div>
 
-<style scoped>
+<style scoped lang="postcss">
 	.user-circle {
 		width: 40px;
 		height: 40px;
