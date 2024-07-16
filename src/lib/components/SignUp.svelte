@@ -34,7 +34,7 @@
 				redirectTo: '/account'
 			}
 		});
-		console.log(data, error);
+		console.log(data);
 
 		if (error) {
 			throw error;
@@ -50,17 +50,19 @@
 				email
 			})
 			.then(async (customer) => {
-				console.log(customer);
-				const response = await supabase
-					.from('customers')
-					.update({
-						customer_id: customer.id
-					})
-					.match({
-						id: data.user.id
-					});
+				// Create a new customer in the database customers table with id data.user.id and stripe_customer_id customer.id
+				const { dataFromUpsert, error } = await supabase.from('customers').upsert([
+					{
+						id: data.user.id,
+						stripe_customer_id: customer.id
+					}
+				]);
 
-				console.log(response);
+				console.log(dataFromUpsert);
+
+				if (error) {
+					throw error;
+				}
 			});
 	}
 </script>

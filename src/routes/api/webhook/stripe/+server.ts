@@ -55,14 +55,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			case 'product.deleted':
 				await deleteProductRecord(event.data.object as stripe.Product);
 				break;
-			case 'customer.created':
-			case 'customer.updated':
-				// TODO - this should be passing the supabase customer uuid not the stripe customer id
-				await createOrRetrieveCustomer({
-					email: (event.data.object as stripe.Customer).email!,
-					uuid: event.data.object.id
-				});
-				break;
+			// case 'customer.created':
+			// case 'customer.updated':
+			// 	// TODO - this should be passing the supabase customer uuid not the stripe customer id
+			// 	await createOrRetrieveCustomer({
+			// 		email: (event.data.object as stripe.Customer).email!,
+			// 		uuid: event.data.object.id
+			// 	});
+			// 	break;
 			case 'customer.subscription.created':
 			case 'customer.subscription.updated':
 			case 'customer.subscription.deleted': {
