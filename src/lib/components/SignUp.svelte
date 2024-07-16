@@ -12,39 +12,56 @@
 
 	async function signUpNewUser() {
 		try {
-			const { data, error } = await supabase.auth.signUp({
-				email: email,
-				password: password,
-				options: {
-					// Redirect URL after successful sign-up
-					redirectTo: '/account'
-				}
+			await supabaseSignUp().then((data) => {
+				console.log(data);
+				createStripeCustomer(data);
 			});
-
-			if (error) {
-				throw error;
-			}
-
-			const customer = await stripeClient.customers.create({
-				email
-			});
-
-			const response = await supabase
-				.from('user')
-				.update({
-					customer_id: customer.id
-				})
-				.match({
-					id: data.user.id
-				});
-
-			console.log(response);
 
 			// Handle success (optional)
 		} catch (error: any) {
 			console.error('Sign up error:', error.message);
 			// Handle error
 		}
+	}
+
+	async function supabaseSignUp() {
+		console.log('supabaseSignUp');
+		const { data, error } = await supabase.auth.signUp({
+			email: email,
+			password: password,
+			options: {
+				// Redirect URL after successful sign-up
+				redirectTo: '/account'
+			}
+		});
+		console.log(data, error);
+
+		if (error) {
+			throw error;
+		}
+
+		return data;
+	}
+
+	async function createStripeCustomer(data: any) {
+		console.log('createStripeCustomer');
+		await stripeClient.customers
+			.create({
+				email
+			})
+			.then(async (customer) => {
+				console.log(customer);
+				const response = await supabase
+					.from('customers')
+					.update({
+						customer_id: customer.id
+					})
+					.match({
+						id: data.user.id
+					});
+
+				console.log(response);
+			});
 	}
 </script>
 
