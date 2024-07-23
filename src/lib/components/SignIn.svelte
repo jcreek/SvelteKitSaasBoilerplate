@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { general } from '$lib/stores/generalStore.js';
-
+	import stripe from 'stripe';
+	import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
+	
+	const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+	
 	const dispatch = createEventDispatcher();
 
 	function emitSignedInEvent() {
@@ -13,16 +17,62 @@
 
 	// Access the supabase client from the layout data
 	export let supabase: any;
+	export let session: any;
 
 	async function signInWithEmail() {
-		// TODO use the data and error from the response
-		const { data, error } = await supabase.auth
-			.signInWithPassword({
+		try {
+			// Sign in with email and password
+			const { data, error } = await supabase.auth.signInWithPassword({
 				email: email,
-				password: password
+				password: password,
+			});
+
+			if (error) {
+				console.error('Sign in error:', error.message);
+				return;
+			}
+
+			// Emit signed-in event
+			emitSignedInEvent();
+
+			// Check if the session data is available
+			if (data && data.session && data.session.user) {
+				const userId = data.session.user.id;
+				// Create Stripe customer
+				await createStripeCustomer(userId);
+			} else {
+				console.error('User session data is missing');
+			}
+
+			// Log data for debugging purposes
+			console.log(data);
+
+		} catch (err) {
+			console.error('Unexpected error:', err);
+		}
+	}
+
+
+	async function createStripeCustomer(userId: string) {
+		console.log('createStripeCustomer');
+		await stripeClient.customers
+			.create({
+				email
 			})
-			.then(() => {
-				emitSignedInEvent();
+			.then(async (customer) => {
+				// Create a new customer in the database customers table with id data.user.id and stripe_customer_id customer.id
+				const { dataFromUpsert, error } = await supabase.from('customers').upsert([
+					{
+						id: userId,
+						stripe_customer_id: customer.id
+					}
+				]);
+
+				console.log(dataFromUpsert);
+
+				if (error) {
+					throw error;
+				}
 			});
 	}
 

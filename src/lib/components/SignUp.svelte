@@ -1,21 +1,14 @@
 <script lang="ts">
-	import stripe from 'stripe';
-	import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-
 	let email = '';
 	let password = '';
 
 	// Access the supabase client from the layout data
 	export let supabase: any;
 
-	const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
 
 	async function signUpNewUser() {
 		try {
-			await supabaseSignUp().then((data) => {
-				console.log(data);
-				createStripeCustomer(data);
-			});
+			await supabaseSignUp();
 
 			// Handle success (optional)
 		} catch (error: any) {
@@ -41,29 +34,6 @@
 		}
 
 		return data;
-	}
-
-	async function createStripeCustomer(data: any) {
-		console.log('createStripeCustomer');
-		await stripeClient.customers
-			.create({
-				email
-			})
-			.then(async (customer) => {
-				// Create a new customer in the database customers table with id data.user.id and stripe_customer_id customer.id
-				const { dataFromUpsert, error } = await supabase.from('customers').upsert([
-					{
-						id: data.user.id,
-						stripe_customer_id: customer.id
-					}
-				]);
-
-				console.log(dataFromUpsert);
-
-				if (error) {
-					throw error;
-				}
-			});
 	}
 </script>
 

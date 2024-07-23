@@ -155,8 +155,15 @@ const createOrRetrieveCustomer = async ({ email, uuid }: { email: string; uuid: 
 		console.warn(`Supabase customer record was missing. A new record was created.`);
 
 		// If Supabase has no record, create a new record and return Stripe customer ID
-		const upsertedStripeCustomer = await upsertCustomerToSupabase(uuid, stripeIdToInsert);
-		if (!upsertedStripeCustomer) throw new Error('Supabase customer record creation failed.');
+		try {
+			const upsertedStripeCustomer = await upsertCustomerToSupabase(uuid, stripeIdToInsert);
+			
+			if (!upsertedStripeCustomer) throw new Error('Supabase customer record creation failed.');
+			return upsertedStripeCustomer;
+		} catch (error) {
+			console.error(`Supabase customer record creation failed: ${error}`);
+			return null;
+		}
 
 		return upsertedStripeCustomer;
 	}
