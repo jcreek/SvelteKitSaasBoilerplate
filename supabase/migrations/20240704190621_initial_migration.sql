@@ -5,38 +5,26 @@
 create table users (
   -- UUID from auth.users
   id uuid references auth.users not null primary key,
-  full_name text,
-  avatar_url text,
-  -- The customer's billing address, stored in JSON format.
-  billing_address jsonb,
-  -- Stores your customer's payment instruments.
-  payment_method jsonb
+  name text
 );
-alter table users
-  enable row level security;
-create policy "Can view own user data." on users
-  for select using ((select auth.uid()) = id);
-create policy "Can update own user data." on users
-  for update using ((select auth.uid()) = id);
+alter table users enable row level security;
+create policy "Can view own user data." on users for select using (auth.uid() = id);
+create policy "Can update own user data." on users for update using (auth.uid() = id);
 
 /**
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
 */
 create function public.handle_new_user()
-returns trigger as
-$$
-  begin
-    insert into public.users (id, full_name, avatar_url)
-    values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
-    return new;
-  end;
-$$
-language plpgsql security definer;
-
+returns trigger as $$
+begin
+  insert into public.users (id, name)
+  values (new.id, new.raw_user_meta_data->>'name');
+  return new;
+end;
+$$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row
-    execute procedure public.handle_new_user();
+  for each row execute procedure public.handle_new_user();
 
 /**
 * CUSTOMERS
@@ -64,15 +52,17 @@ create table products (
   name text,
   -- The product's description, meant to be displayable to the customer. Use this field to optionally store a long form explanation of the product being sold for your own rendering purposes.
   description text,
-  -- A URL of the product image in Stripe, meant to be displayable to the customer.
-  image text,
+  -- URLs of the product images in Stripe, meant to be displayable to the customer.
+  images text[],
+  -- A list of up to 15 features for this product. These are displayed in pricing tables.
+  features text[],
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
-  metadata jsonb
+  metadata jsonb,
+  "created_at" timestamp with time zone not null default now(),
+  "updated_at" timestamp with time zone not null default now()
 );
-alter table products
-  enable row level security;
-create policy "Allow public read-only access." on products
-  for select using (true);
+alter table products enable row level security;
+create policy "Allow public read-only access." on products for select using (true);
 
 /**
 * PRICES
@@ -83,8 +73,8 @@ create type pricing_plan_interval as enum ('day', 'week', 'month', 'year');
 create table prices (
   -- Price ID from Stripe, e.g. price_1234.
   id text primary key,
-  -- The ID of the prduct that this price belongs to.
-  product_id text references products,
+  -- The ID of the product that this price belongs to.
+  product_id text not null references products,
   -- Whether the price can be used for new purchases.
   active boolean,
   -- A brief description of the price.
@@ -104,16 +94,14 @@ create table prices (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb
 );
-alter table prices
-  enable row level security;
-create policy "Allow public read-only access." on prices
-  for select using (true);
+alter table prices enable row level security;
+create policy "Allow public read-only access." on prices for select using (true);
 
 /**
 * SUBSCRIPTIONS
 * Note: subscriptions are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
-create type subscription_status as enum ('trialing', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'unpaid');
+create type subscription_status as enum ('trialing', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'unpaid', 'paused');
 create table subscriptions (
   -- Subscription ID from Stripe, e.g. sub_1234.
   id text primary key,
@@ -145,15 +133,5 @@ create table subscriptions (
   -- If the subscription has a trial, the end of that trial.
   trial_end timestamp with time zone default timezone('utc'::text, now())
 );
-alter table subscriptions
-  enable row level security;
-create policy "Can only view own subs data." on subscriptions
-  for select using ((select auth.uid()) = user_id);
-
-/**
- * REALTIME SUBSCRIPTIONS
- * Only allow realtime listening on public tables.
- */
-drop publication if exists supabase_realtime;
-create publication supabase_realtime
-  for table products, prices;
+alter table subscriptions enable row level security;
+create policy "Can only view own subs data." on subscriptions for select using (auth.uid() = user_id);
