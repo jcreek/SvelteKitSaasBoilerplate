@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import stripe from 'stripe';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import { PUBLIC_STRIPE_ENDPOINT_SECRET } from '$env/static/public';
+import { STRIPE_SECRET_KEY } from '$env/static/private';
+import { STRIPE_ENDPOINT_SECRET } from '$env/static/private';
 import {
 	deletePriceRecord,
 	deleteProductRecord,
@@ -10,7 +10,7 @@ import {
 	upsertProductRecord
 } from '$lib/utils/supabase/admin';
 
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+const stripeClient = new stripe(STRIPE_SECRET_KEY);
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.text();
@@ -23,13 +23,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Only verify the event if you have an endpoint secret defined.
 		// Otherwise use the basic event deserialized with JSON.parse
-		if (PUBLIC_STRIPE_ENDPOINT_SECRET && signature) {
+		if (STRIPE_ENDPOINT_SECRET && signature) {
 			try {
-				event = stripeClient.webhooks.constructEvent(
-					body,
-					signature,
-					PUBLIC_STRIPE_ENDPOINT_SECRET
-				);
+				event = stripeClient.webhooks.constructEvent(body, signature, STRIPE_ENDPOINT_SECRET);
 			} catch (err) {
 				console.error(`⚠️  Webhook signature verification failed.`, err.message);
 				return {
@@ -44,6 +40,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			case 'product.updated':
 				await upsertProductRecord(event.data.object as stripe.Product);
 				break;
+			case 'product.deleted':
+				await deleteProductRecord(event.data.object as stripe.Product);
+				break;
 			case 'price.created':
 			case 'price.updated':
 				await upsertPriceRecord(event.data.object as stripe.Price);
@@ -51,12 +50,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			case 'price.deleted':
 				await deletePriceRecord(event.data.object as stripe.Price);
 				break;
-			case 'product.deleted':
-				await deleteProductRecord(event.data.object as stripe.Product);
-				break;
 			case 'customer.subscription.created':
 			case 'customer.subscription.updated':
-			case 'customer.subscription.deleted': {
+			case 'customer.subscription.deleted':
+			case 'customer.subscription.paused':
+			case 'customer.subscription.resumed': {
 				const subscription = event.data.object as stripe.Subscription;
 				await manageSubscriptionStatusChange(
 					subscription.id,
@@ -86,10 +84,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			status: 200
 		});
 	} catch (err) {
-		console.log(`Webhook Error: ${err.message}`);
-		return {
-			status: 400,
-			body: `Webhook Error: ${err.message}`
-		};
+		const message = err instanceof Error ? err.message : 'An unknown error has occurred';
+		return new Response(`Webhook Error: ${message}`, { status: 500 });
 	}
 };
