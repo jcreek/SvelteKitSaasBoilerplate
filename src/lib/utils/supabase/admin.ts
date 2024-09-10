@@ -31,8 +31,11 @@ const upsertProductRecord = async (product: stripe.Product) => {
 		active: product.active,
 		name: product.name,
 		description: product.description ?? null,
-		image: product.images?.[0] ?? null,
-		metadata: product.metadata
+		features: product.marketing_features.map(({ name }) => name || '').filter((name) => !!name),
+		images: product.images ?? null,
+		metadata: product.metadata,
+		created: new Date(product.created * 1000).toISOString(),
+		updated: new Date(product.updated * 1000).toISOString()
 	};
 
 	const { error: upsertError } = await supabaseAdmin.from('products').upsert([productData]);
@@ -46,6 +49,8 @@ const upsertPriceRecord = async (price: stripe.Price, retryCount = 0, maxRetries
 		product_id: typeof price.product === 'string' ? price.product : '',
 		active: price.active,
 		currency: price.currency,
+		description: price.nickname ?? null,
+		metadata: price.metadata,
 		type: price.type,
 		unit_amount: price.unit_amount ?? null,
 		interval: price.recurring?.interval ?? null,
