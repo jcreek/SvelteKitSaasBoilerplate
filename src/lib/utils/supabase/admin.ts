@@ -213,9 +213,7 @@ const manageSubscriptionStatusChange = async (
 		metadata: subscription.metadata,
 		status: subscription.status,
 		price_id: subscription.items.data[0].price.id,
-		//TODO check quantity on subscription
-
-		quantity: subscription.quantity,
+		quantity: 1, //subscription.quantity,
 		cancel_at_period_end: subscription.cancel_at_period_end,
 		cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
 		canceled_at: subscription.canceled_at
@@ -237,13 +235,14 @@ const manageSubscriptionStatusChange = async (
 	if (upsertError) throw new Error(`Subscription insert/update failed: ${upsertError.message}`);
 	console.log(`Inserted/updated subscription [${subscription.id}] for user [${uuid}]`);
 
-	// For a new subscription copy the billing details to the customer object.
-	// NOTE: This is a costly operation and should happen at the very end.
-	if (createAction && subscription.default_payment_method && uuid)
-		await copyBillingDetailsToCustomer(
-			uuid,
-			subscription.default_payment_method as stripe.PaymentMethod
-		);
+	// // For a new subscription copy the billing details to the customer object.
+	// // NOTE: This is a costly operation and should happen at the very end.
+	// if (createAction && subscription.default_payment_method && uuid) {
+	// 	await copyBillingDetailsToCustomer(
+	// 		uuid,
+	// 		subscription.default_payment_method as stripe.PaymentMethod
+	// 	);
+	// }
 };
 
 export {
