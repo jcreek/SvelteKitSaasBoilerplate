@@ -1,6 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import stripe from 'stripe';
-import { STRIPE_SECRET_KEY } from '$env/static/private';
 import { STRIPE_ENDPOINT_SECRET } from '$env/static/private';
 import {
 	deletePriceRecord,
@@ -9,8 +8,7 @@ import {
 	upsertPriceRecord,
 	upsertProductRecord
 } from '$lib/utils/supabase/admin';
-
-const stripeClient = new stripe(STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.text();
@@ -36,6 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		switch (event.type) {
+			// Product events
 			case 'product.created':
 			case 'product.updated':
 				await upsertProductRecord(event.data.object as stripe.Product);
@@ -45,8 +44,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			case 'price.created':
 			case 'price.updated':
-				await upsertPriceRecord(event.data.object as stripe.Price);
-				break;
+				await upsertPrice(event.data.object)
+				break
 			case 'price.deleted':
 				await deletePriceRecord(event.data.object as stripe.Price);
 				break;
@@ -76,15 +75,12 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			}
 			default:
-				console.error(`Unhandled event type ${event.type}`);
+				console.log(`Unhandled event type ${event.type}`)
 		}
-
-		// Return a response to acknowledge receipt of the event
-		return new Response(JSON.stringify({ received: true }), {
-			status: 200
-		});
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'An unknown error has occurred';
 		return new Response(`Webhook Error: ${message}`, { status: 500 });
 	}
-};
+
+	return json({received: true})
+}

@@ -1,8 +1,5 @@
 import { type RequestHandler, redirect } from '@sveltejs/kit';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import stripe from 'stripe';
-
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 // Create a checkout session
 export const POST: RequestHandler = async ({ request, cookies }) => {

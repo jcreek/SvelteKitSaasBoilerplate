@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import stripe from 'stripe';
 import type { Database, Tables, TablesInsert } from '$lib/types/supabase';
-import { PUBLIC_SUPABASE_URL, PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
+import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 const toDateTime = (secs: number) => {
 	const t = new Date(+0); // Unix epoch start.
@@ -10,7 +11,6 @@ const toDateTime = (secs: number) => {
 	return t;
 };
 
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
