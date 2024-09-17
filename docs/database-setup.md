@@ -90,3 +90,15 @@ Reset database in cloud
 5. Verify your email domain via DKIM or DMARC
 6. In Brevo go to https://app.brevo.com/settings/keys/smtp to see your SMTP credentials.
 7. Fill in the SMTP credentials in Supabase.
+8. Go to https://supabase.com/dashboard/project/[your-project-here]/auth/url-configuration
+9. Add these redirect URLs:
+
+- `http://localhost:3000`
+- `http://localhost:3000/**`
+- `https://www.your-domain.com`
+- `https://your-domain.com`
+- `http://localhost:5173`
+- `http://localhost:5173/**`
+- Add your netlify.app domain here with **-- at the start, e.g. `http://**--your-netlify-app.netlify.app`
+
+10.
