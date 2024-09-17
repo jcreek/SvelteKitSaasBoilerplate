@@ -16,7 +16,7 @@ stripe listen
 
 Add the secret key to to your .env(.local):
 
-`PUBLIC_STRIPE_ENDPOINT_SECRET`
+`STRIPE_ENDPOINT_SECRET`
 
 ### Testing the webhook locally
 
