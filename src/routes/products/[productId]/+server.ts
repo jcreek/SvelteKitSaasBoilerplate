@@ -1,7 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import stripe from 'stripe';
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 export const GET = async ({ params }) => {
 	const { productId } = params;
