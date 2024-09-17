@@ -75,3 +75,30 @@ Reset database in cloud
 > Prerequisite login using `npx supabase login`
 
 `npx supabase db reset --linked`
+
+## Enabling sending emails with Brevo
+
+1. Go to the Project Settings in Supabase, then Authentication, then SMTP Settings.
+2. Enable custom SMTP and fill in the required fields with your Brevo credentials.
+
+- You need to have an email address that you can send stuff from
+- You need to have a Brevo account
+- sender email as noreply@yourdomain.com
+
+3. https://app.brevo.com/senders/list to add senders
+4. Add a sender for noreply@yourdomain.com
+5. Verify your email domain via DKIM or DMARC
+6. In Brevo go to https://app.brevo.com/settings/keys/smtp to see your SMTP credentials.
+7. Fill in the SMTP credentials in Supabase.
+8. Go to https://supabase.com/dashboard/project/[your-project-here]/auth/url-configuration
+9. Add these redirect URLs:
+
+- `http://localhost:3000`
+- `http://localhost:3000/**`
+- `https://www.your-domain.com`
+- `https://your-domain.com`
+- `http://localhost:5173`
+- `http://localhost:5173/**`
+- Add your netlify.app domain here with **-- at the start, e.g. `http://**--your-netlify-app.netlify.app`
+
+10.
