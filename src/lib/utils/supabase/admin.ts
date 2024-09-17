@@ -31,8 +31,11 @@ const upsertProductRecord = async (product: stripe.Product) => {
 		active: product.active,
 		name: product.name,
 		description: product.description ?? null,
-		image: product.images?.[0] ?? null,
-		metadata: product.metadata
+		features: product.marketing_features.map(({ name }) => name || '').filter((name) => !!name),
+		images: product.images ?? null,
+		metadata: product.metadata,
+		created: new Date(product.created * 1000).toISOString(),
+		updated: new Date(product.updated * 1000).toISOString()
 	};
 
 	const { error: upsertError } = await supabaseAdmin.from('products').upsert([productData]);
@@ -46,6 +49,8 @@ const upsertPriceRecord = async (price: stripe.Price, retryCount = 0, maxRetries
 		product_id: typeof price.product === 'string' ? price.product : '',
 		active: price.active,
 		currency: price.currency,
+		description: price.nickname ?? null,
+		metadata: price.metadata,
 		type: price.type,
 		unit_amount: price.unit_amount ?? null,
 		interval: price.recurring?.interval ?? null,
@@ -208,9 +213,7 @@ const manageSubscriptionStatusChange = async (
 		metadata: subscription.metadata,
 		status: subscription.status,
 		price_id: subscription.items.data[0].price.id,
-		//TODO check quantity on subscription
-
-		quantity: subscription.quantity,
+		quantity: 1, //subscription.quantity,
 		cancel_at_period_end: subscription.cancel_at_period_end,
 		cancel_at: subscription.cancel_at ? toDateTime(subscription.cancel_at).toISOString() : null,
 		canceled_at: subscription.canceled_at
@@ -232,13 +235,14 @@ const manageSubscriptionStatusChange = async (
 	if (upsertError) throw new Error(`Subscription insert/update failed: ${upsertError.message}`);
 	console.log(`Inserted/updated subscription [${subscription.id}] for user [${uuid}]`);
 
-	// For a new subscription copy the billing details to the customer object.
-	// NOTE: This is a costly operation and should happen at the very end.
-	if (createAction && subscription.default_payment_method && uuid)
-		await copyBillingDetailsToCustomer(
-			uuid,
-			subscription.default_payment_method as stripe.PaymentMethod
-		);
+	// // For a new subscription copy the billing details to the customer object.
+	// // NOTE: This is a costly operation and should happen at the very end.
+	// if (createAction && subscription.default_payment_method && uuid) {
+	// 	await copyBillingDetailsToCustomer(
+	// 		uuid,
+	// 		subscription.default_payment_method as stripe.PaymentMethod
+	// 	);
+	// }
 };
 
 export {
