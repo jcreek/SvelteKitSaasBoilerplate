@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import stripe from 'stripe';
-import type { Database, Tables, TablesInsert } from '$types/supabase';
+import type { Database, Tables, TablesInsert } from '$lib/types/supabase';
 import { PUBLIC_SUPABASE_URL, PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 
@@ -34,8 +34,8 @@ const upsertProductRecord = async (product: stripe.Product) => {
 		features: product.marketing_features.map(({ name }) => name || '').filter((name) => !!name),
 		images: product.images ?? null,
 		metadata: product.metadata,
-		created: new Date(product.created * 1000).toISOString(),
-		updated: new Date(product.updated * 1000).toISOString()
+		created_at: new Date(product.created * 1000).toISOString(),
+		updated_at: new Date(product.updated * 1000).toISOString()
 	};
 
 	const { error: upsertError } = await supabaseAdmin.from('products').upsert([productData]);

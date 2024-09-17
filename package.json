@@ -10,7 +10,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"generate": "supabase gen types typescript --local > types/supabase.d.ts && prettier --write types/supabase.d.ts"
+		"generate": "supabase gen types typescript --local > src/lib/types/supabase.d.ts && prettier --write src/lib/types/supabase.d.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

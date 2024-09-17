@@ -2,7 +2,7 @@
 // for information about these interfaces
 // and what to do when importing types
 import { SupabaseClient, Session, User } from '@supabase/supabase-js';
-import type { Database } from '$lib/generated/supabase-schema';
+import type { Database } from '$lib/types/supabase';
 declare global {
 	const __DATE__: string;
 	const __RELOAD_SW__: boolean;
