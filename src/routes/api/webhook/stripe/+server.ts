@@ -44,8 +44,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			case 'price.created':
 			case 'price.updated':
-				await upsertPrice(event.data.object)
-				break
+				await upsertPriceRecord(event.data.object as stripe.Price);
+				break;
 			case 'price.deleted':
 				await deletePriceRecord(event.data.object as stripe.Price);
 				break;
