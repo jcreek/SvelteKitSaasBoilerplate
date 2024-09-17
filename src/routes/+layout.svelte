@@ -5,14 +5,14 @@
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 	import { general } from '$lib/stores/generalStore.js';
 	import { invalidate } from '$app/navigation';
-	import SignIn from '$lib/components/SignIn.svelte';
 	import SignOut from '$lib/components/SignOut.svelte';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import NavLinks from '$lib/components/NavLinks.svelte';
+	import MagicLink from '$lib/components/MagicLink.svelte';
 
 	export let data;
-	let { supabase, session } = data;
-	$: ({ supabase, session } = data);
+	let { supabase, session, url } = data;
+	$: ({ supabase, session, url } = data);
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
@@ -113,8 +113,8 @@
 					<span class="badge badge-sm indicator-item">{localBasket.items.length}</span>
 				</div>
 			</a>
-			<div class="dropdown dropdown-end">
-				<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+			<details class="dropdown dropdown-end">
+				<summary tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
 					<div class="w-10 rounded-full">
 						{#if session?.user}
 							<div class="user-circle text-primary-content border-primary-content">
@@ -130,7 +130,7 @@
 							</svg>
 						{/if}
 					</div>
-				</div>
+				</summary>
 
 				{#if session?.user}
 					<ul
@@ -147,10 +147,10 @@
 					<div
 						class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box min-w-[13rem] w-auto"
 					>
-						<SignIn {supabase} />
+						<MagicLink {supabase} {url} />
 					</div>
 				{/if}
-			</div>
+			</details>
 		</div>
 	</nav>
 </header>

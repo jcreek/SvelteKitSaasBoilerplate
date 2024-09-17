@@ -1,9 +1,9 @@
 <script lang="ts">
-	import SignUp from '$lib/components/SignUp.svelte';
+	import MagicLink from '$lib/components/MagicLink.svelte';
 
 	export let data;
-	let { supabase, session } = data;
-	$: ({ supabase, session } = data);
+	let { supabase, session, url } = data;
+	$: ({ supabase, session, url } = data);
 </script>
 
 {#if session !== null}
@@ -19,7 +19,7 @@
 				</h1>
 			</div>
 			<div id="sign-up" class="card shrink-0 w-full max-w-sm shadow-2xl">
-				<SignUp {supabase} />
+				<MagicLink {supabase} {url} />
 			</div>
 		</div>
 	</div>
