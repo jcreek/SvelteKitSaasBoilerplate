@@ -17,6 +17,11 @@ npm run dev -- --open
 
 An example `.env` file is provided in the repository. You will need to copy `.env.example` to `.env` and fill in the values with your own credentials.
 
+If you want a fully local development environment (other than stripe) then you can follow the instructions in the [database setup](/docs/database-setup.md) document and make use of the local supabase instance and a local email service.
+
+- [Local DB Url](http://localhost:54323/)
+- [Local Email Monitoring Url](http://localhost:54324/)
+
 ## Building
 
 To create a production version:

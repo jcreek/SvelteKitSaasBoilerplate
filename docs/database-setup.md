@@ -34,6 +34,8 @@ npx supabase start
 npx supabase stop
 ```
 
+This will start the local DB and email monitoring services. You can access the web interfaces for the local DB at [http://localhost:54323/](http://localhost:54323/) and the email monitoring at [http://localhost:54324/](http://localhost:54324/).It will also give you the API URL, anon key and service_role key to put in your `.env` file for local development.
+
 ## Migrations
 
 There are two options to create a migration file:
