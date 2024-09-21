@@ -3,6 +3,10 @@
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 	import BasketItem from '$lib/components/checkout/BasketItem.svelte';
 
+	export let data;
+	let { supabase, session, url } = data;
+	$: ({ supabase, session, url } = data);
+
 	let localBasket: Basket;
 	const unsubscribe = basket.subscribe((value) => {
 		localBasket = value;
@@ -101,28 +105,32 @@
 						/>
 					</svg>
 				</a>
-				<button
-					type="submit"
-					class="btn btn-primary"
-					disabled={localBasket.items && localBasket.items.length === 0}
-					>Continue to Payment
-					<svg
-						class="ml-2"
-						xmlns="http://www.w3.org/2000/svg"
-						width="23"
-						height="22"
-						viewBox="0 0 23 22"
-						fill="none"
-					>
-						<path
-							d="M8.75324 5.49609L14.2535 10.9963L8.75 16.4998"
-							stroke="white"
-							stroke-width="1.6"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</button>
+				{#if session?.user !== undefined}
+					<button
+						type="submit"
+						class="btn btn-primary"
+						disabled={localBasket.items && localBasket.items.length === 0}
+						>Continue to Payment
+						<svg
+							class="ml-2"
+							xmlns="http://www.w3.org/2000/svg"
+							width="23"
+							height="22"
+							viewBox="0 0 23 22"
+							fill="none"
+						>
+							<path
+								d="M8.75324 5.49609L14.2535 10.9963L8.75 16.4998"
+								stroke="white"
+								stroke-width="1.6"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+				{:else}
+					<p>You must sign in to checkout</p>
+				{/if}
 			</div>
 		</form>
 	</div>
