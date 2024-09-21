@@ -22,6 +22,8 @@ If you want a fully local development environment (other than stripe) then you c
 - [Local DB Url](http://localhost:54323/)
 - [Local Email Monitoring Url](http://localhost:54324/)
 
+For stripe, you can forward the events to your local server using `stripe listen --forward-to localhost:5173/api/webhook/stripe --skip-verify` in a separate terminal window.
+
 ## Building
 
 To create a production version:

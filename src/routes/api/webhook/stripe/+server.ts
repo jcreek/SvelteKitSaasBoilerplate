@@ -1,4 +1,4 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import stripe from 'stripe';
 import { STRIPE_ENDPOINT_SECRET } from '$env/static/private';
 import {
@@ -71,16 +71,19 @@ export const POST: RequestHandler = async ({ request }) => {
 						checkoutSession.customer as string,
 						true
 					);
+				} else if (checkoutSession.mode === 'payment') {
+					// TODO Record that they purchased the product
+					console.log(checkoutSession);
 				}
 				break;
 			}
 			default:
-				console.log(`Unhandled event type ${event.type}`)
+				console.log(`Unhandled event type ${event.type}`);
 		}
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'An unknown error has occurred';
 		return new Response(`Webhook Error: ${message}`, { status: 500 });
 	}
 
-	return json({received: true})
-}
+	return json({ received: true });
+};
