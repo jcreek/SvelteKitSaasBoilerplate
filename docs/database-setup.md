@@ -16,11 +16,11 @@ To get the types for the tables, you can follow these instructions taken from [h
 
 `npx supabase init`
 
-Replace `$PROJECT_REF` with your project reference:
-`npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > types/supabase.ts`
+Replace `$PROJECT_REF` with your project reference and replace `types/supabase.d.ts` with whatever file you want your types in:
+`npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > src/lib/types/supabase.d.ts`
 
-Replace `types/supabase.d.ts` with whatever file you want your types in:
-`npx supabase gen types typescript --local > types/supabase.d.ts`
+If you are using a local Supabase instance, you can use the following command to generate the types:
+`npx supabase gen types typescript --local > src/lib/types/supabase.d.ts`
 
 ## Local DB Development
 

@@ -6,7 +6,8 @@ import {
 	deleteProductRecord,
 	manageSubscriptionStatusChange,
 	upsertPriceRecord,
-	upsertProductRecord
+	upsertProductRecord,
+	recordProductPurchase
 } from '$lib/utils/supabase/admin';
 import { stripe as stripeClient } from '$lib/utils/stripe';
 
@@ -34,7 +35,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		switch (event.type) {
-			// Product events
 			case 'product.created':
 			case 'product.updated':
 				await upsertProductRecord(event.data.object as stripe.Product);
@@ -64,6 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 			case 'checkout.session.completed': {
 				const checkoutSession = event.data.object as stripe.Checkout.Session;
+
 				if (checkoutSession.mode === 'subscription') {
 					const subscriptionId = checkoutSession.subscription;
 					await manageSubscriptionStatusChange(
@@ -72,8 +73,33 @@ export const POST: RequestHandler = async ({ request }) => {
 						true
 					);
 				} else if (checkoutSession.mode === 'payment') {
-					// TODO Record that they purchased the product
-					console.log(checkoutSession);
+					// Fetch session with expanded line_items
+					const sessionWithLineItems = await stripeClient.checkout.sessions.retrieve(
+						checkoutSession.id,
+						{
+							expand: ['line_items']
+						}
+					);
+
+					const lineItems = sessionWithLineItems.line_items?.data;
+					const userId = checkoutSession.metadata!.userId;
+
+					if (!lineItems) {
+						throw new Error('No line items found in session');
+					}
+
+					if (!userId) {
+						throw new Error('No user ID found in session metadata');
+					}
+
+					for (const item of lineItems ?? []) {
+						const productId = item.price?.product as string;
+						const priceId = item.price?.id as string;
+
+						if (productId && priceId) {
+							await recordProductPurchase(userId, productId, priceId);
+						}
+					}
 				}
 				break;
 			}

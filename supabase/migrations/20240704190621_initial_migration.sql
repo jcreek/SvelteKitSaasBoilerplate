@@ -135,3 +135,19 @@ create table subscriptions (
 );
 alter table subscriptions enable row level security;
 create policy "Can only view own subs data." on subscriptions for select using (auth.uid() = user_id);
+
+-- Purchases table to record product purchases.
+create table purchases (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users not null,
+  product_id text references products(id) not null,
+  price_id text references prices(id) not null,
+  purchased_at timestamp with time zone not null default now()
+);
+
+-- Enabling row-level security for purchases.
+alter table purchases enable row level security;
+
+-- Creating a policy to ensure that users can only view their own purchase data.
+create policy "Can view own purchase data." on purchases for select using (auth.uid() = user_id);
+create policy "Can insert own purchase data." on purchases for insert with check (auth.uid() = user_id);

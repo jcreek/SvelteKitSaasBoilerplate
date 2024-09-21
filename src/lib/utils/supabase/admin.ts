@@ -11,7 +11,6 @@ const toDateTime = (secs: number) => {
 	return t;
 };
 
-
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
 
@@ -245,11 +244,32 @@ const manageSubscriptionStatusChange = async (
 	// }
 };
 
+const recordProductPurchase = async (userId: string, productId: string, priceId: string) => {
+	console.log(
+		`Recording product purchase for user [${userId}] and product [${productId}] with price [${priceId}]`
+	);
+
+	try {
+		const { error } = await supabaseAdmin
+			.from('purchases')
+			.insert([{ user_id: userId, product_id: productId, price_id: priceId }]);
+
+		if (error) {
+			throw new Error(`Failed to record product purchase: ${error.message}`);
+		}
+	} catch (error) {
+		console.error(error);
+	}
+
+	console.log(`Product purchased recorded for user [${userId}] and product [${productId}]`);
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
 	deleteProductRecord,
 	deletePriceRecord,
 	createOrRetrieveCustomer,
-	manageSubscriptionStatusChange
+	manageSubscriptionStatusChange,
+	recordProductPurchase
 };
