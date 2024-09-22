@@ -6,4 +6,4 @@
 	$: ({ supabase, session, url } = data);
 </script>
 
-<MagicLink {supabase} {url} />
+<MagicLink {supabase} />

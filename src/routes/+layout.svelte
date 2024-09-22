@@ -147,7 +147,7 @@
 					<div
 						class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box min-w-[13rem] w-auto"
 					>
-						<MagicLink {supabase} {url} />
+						<MagicLink {supabase} />
 					</div>
 				{/if}
 			</details>

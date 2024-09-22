@@ -19,7 +19,7 @@
 				</h1>
 			</div>
 			<div id="sign-up" class="card shrink-0 w-full max-w-sm shadow-2xl">
-				<MagicLink {supabase} {url} />
+				<MagicLink {supabase} />
 			</div>
 		</div>
 	</div>
