@@ -20,4 +20,4 @@
 		<li><a href="/">Submenu 2</a></li>
 	</ul>
 </li>
-<li><a href="/">Item 3</a></li>
+<li><a href="/tools/exampleproduct">Example Product</a></li>

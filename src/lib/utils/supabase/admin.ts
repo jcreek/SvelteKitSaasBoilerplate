@@ -211,6 +211,7 @@ const manageSubscriptionStatusChange = async (
 		user_id: uuid,
 		metadata: subscription.metadata,
 		status: subscription.status,
+		product_id: subscription.items.data[0].price.product as string,
 		price_id: subscription.items.data[0].price.id,
 		quantity: 1, //subscription.quantity,
 		cancel_at_period_end: subscription.cancel_at_period_end,
@@ -264,6 +265,39 @@ const recordProductPurchase = async (userId: string, productId: string, priceId:
 	console.log(`Product purchased recorded for user [${userId}] and product [${productId}]`);
 };
 
+const hasProductAccess = async (userId: string, productId: string) => {
+	// Check if user has purchased the product
+	const { data: purchases, error: purchaseError } = await supabaseAdmin
+		.from('purchases')
+		.select('*')
+		.eq('user_id', userId)
+		.eq('product_id', productId);
+
+	if (purchaseError) throw new Error(purchaseError.message);
+
+	if (purchases && purchases.length > 0) {
+		// User has purchased the product
+		return true;
+	}
+
+	// Check if user has an active subscription for the product
+	const { data: subscriptions, error: subError } = await supabaseAdmin
+		.from('subscriptions')
+		.select('*')
+		.eq('user_id', userId)
+		.eq('product_id', productId)
+		.in('status', ['active', 'trialing']);
+
+	if (subError) throw new Error(subError.message);
+
+	if (subscriptions && subscriptions.length > 0) {
+		// User has an active subscription
+		return true;
+	}
+
+	return false;
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -271,5 +305,6 @@ export {
 	deletePriceRecord,
 	createOrRetrieveCustomer,
 	manageSubscriptionStatusChange,
-	recordProductPurchase
+	recordProductPurchase,
+	hasProductAccess
 };

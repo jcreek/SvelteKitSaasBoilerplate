@@ -110,6 +110,8 @@ create table subscriptions (
   status subscription_status,
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb,
+  -- ID of the product this subscription is for.
+  product_id text references products(id) not null,
   -- ID of the price that created this subscription.
   price_id text references prices,
   -- Quantity multiplied by the unit amount of the price creates the amount of the subscription. Can be used to charge multiple seats.

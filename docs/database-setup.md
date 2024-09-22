@@ -6,6 +6,13 @@ Databases are stored in Supabase. The auth table for signing up and logging in u
 
 To add the tables for recording their active subscriptions and bought products, as well as products and prices, you can use the SQL scripts from the `supabase/migrations` folder in the Supabase SQL Editor.
 
+## Common commands for local development
+
+- `npx supabase start` - Start the local Supabase instance
+- `npx supabase stop` - Stop the local Supabase instance
+- `npx supabase db reset` - Reset the local database
+- `npx supabase gen types typescript --local > src/lib/types/supabase.d.ts` - Generate types for the local database
+
 ## Generating Types
 
 To get the types for the tables, you can follow these instructions taken from [here](https://supabase.com/docs/guides/api/rest/generating-types#generating-types-using-supabase-cli):

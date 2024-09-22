@@ -201,6 +201,7 @@ export type Database = {
           id: string
           metadata: Json | null
           price_id: string | null
+          product_id: string
           quantity: number | null
           status: Database["public"]["Enums"]["subscription_status"] | null
           trial_end: string | null
@@ -218,6 +219,7 @@ export type Database = {
           id: string
           metadata?: Json | null
           price_id?: string | null
+          product_id: string
           quantity?: number | null
           status?: Database["public"]["Enums"]["subscription_status"] | null
           trial_end?: string | null
@@ -235,6 +237,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           price_id?: string | null
+          product_id?: string
           quantity?: number | null
           status?: Database["public"]["Enums"]["subscription_status"] | null
           trial_end?: string | null
@@ -247,6 +250,13 @@ export type Database = {
             columns: ["price_id"]
             isOneToOne: false
             referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
