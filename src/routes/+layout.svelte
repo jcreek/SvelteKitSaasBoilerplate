@@ -11,8 +11,8 @@
 	import MagicLink from '$lib/components/MagicLink.svelte';
 
 	export let data;
-	let { supabase, session, url } = data;
-	$: ({ supabase, session, url } = data);
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
