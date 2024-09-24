@@ -1,8 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import stripe from 'stripe';
 import type { RequestHandler } from './$types';
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 export const GET: RequestHandler = async ({ cookies }) => {
   const sessionId = cookies.get('checkout_session_id');

@@ -1,21 +1,29 @@
 <script lang="ts">
-	import SignUp from '$lib/components/SignUp.svelte';
+	import MagicLink from '$lib/components/MagicLink.svelte';
 
 	export let data;
 	let { supabase, session } = data;
 	$: ({ supabase, session } = data);
 </script>
 
-<div class="hero bg-base-100 my-36">
-	<div class="hero-content flex-col lg:flex-row-reverse">
-		<div class="text-center lg:text-left">
-			<h1 class="text-5xl font-bold">Sign up for this amazing SaaS right now - don't miss out!</h1>
-		</div>
-		<div id="sign-up" class="card shrink-0 w-full max-w-sm shadow-2xl">
-			<SignUp {supabase} />
+{#if session !== null}
+	<div class="hero bg-base-100 my-36">
+		Welcome back {session.user.email}
+	</div>
+{:else}
+	<div class="hero bg-base-100 my-36">
+		<div class="hero-content flex-col lg:flex-row-reverse">
+			<div class="text-center lg:text-left">
+				<h1 class="text-5xl font-bold">
+					Sign up for this amazing SaaS right now - don't miss out!
+				</h1>
+			</div>
+			<div id="sign-up" class="card shrink-0 w-full max-w-sm shadow-2xl">
+				<MagicLink {supabase} />
+			</div>
 		</div>
 	</div>
-</div>
+{/if}
 
 <div
 	class="md:container md:mx-auto justify-self-center flex justify-center items-center h-full flex-col mb-10"

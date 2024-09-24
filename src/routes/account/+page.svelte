@@ -5,12 +5,12 @@
 	export let data;
 	export let form;
 
-	let { session, supabase, profile } = data;
-	$: ({ session, supabase, profile } = data);
+	let { session, supabase, user } = data;
+	$: ({ session, supabase, user } = data);
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
-	let fullName: string = profile?.full_name ?? '';
+	let name: string = user?.name ?? '';
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true;
@@ -37,13 +37,8 @@
 		bind:this={profileForm}
 	>
 		<div>
-			<label for="email">Username</label>
-			<input id="email" type="text" value={session.user.email} disabled />
-		</div>
-
-		<div>
-			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+			<label for="name">Name</label>
+			<input id="name" name="name" type="text" value={form?.name ?? name} />
 		</div>
 
 		<div>

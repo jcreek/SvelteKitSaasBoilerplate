@@ -1,11 +1,17 @@
 import { type RequestHandler, redirect } from '@sveltejs/kit';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import stripe from 'stripe';
-
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 // Create a checkout session
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, locals: { safeGetSession } }) => {
+	const { session } = await safeGetSession();
+
+	if (!session) {
+		// If no session is found, the user isn't authenticated, so block the action
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	const userId = session.user.id;
+
 	const formData = new URLSearchParams(await request.text());
 	const items: { priceId: string; quantity: number }[] = [];
 
@@ -19,14 +25,17 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		quantity: item.quantity
 	}));
 
-	const session = await stripeClient.checkout.sessions.create({
+	const checkoutSession = await stripeClient.checkout.sessions.create({
 		line_items: lineItems,
 		mode: 'payment',
 		success_url: `${request.headers.get('origin')}/checkout/success`,
-		cancel_url: `${request.headers.get('origin')}/checkout/cancelled`
+		cancel_url: `${request.headers.get('origin')}/checkout/cancelled`,
+		metadata: {
+			userId: userId
+		}
 	});
 
 	// Store the checkout session.id for access from the frontend
-	cookies.set('checkout_session_id', session.id, { path: '/' });
-	return redirect(303, session.url as string);
+	cookies.set('checkout_session_id', checkoutSession.id, { path: '/' });
+	return redirect(303, checkoutSession.url as string);
 };

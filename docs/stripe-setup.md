@@ -16,9 +16,9 @@ stripe listen
 
 Add the secret key to to your .env(.local):
 
-`PUBLIC_STRIPE_ENDPOINT_SECRET`
+`STRIPE_ENDPOINT_SECRET`
 
-### Testing the webhook locally
+## Testing the webhook locally
 
 You can use the [Stripe CLI to forward events to your local server](https://docs.stripe.com/webhooks):
 
@@ -32,4 +32,8 @@ To disable HTTPS certificate verification, use the --skip-verify optional flag.
 stripe listen --forward-to localhost:5173/api/webhook/stripe --skip-verify
 ```
 
-TODO - Add instructions for what else to do to get the webhook working locally.
+## Purchaseable products
+
+As well as subscriptions you can also create purchaseable products in Stripe. These can be used for one-off payments or for products that are not subscription based. To add these to the application you can follow the example product's pattern.
+
+There is a config value `VITE_PRODUCT_ID_EXAMPLEPRODUCT` that is used to identify the product in the Stripe checkout session. This is the product code from Stripe. The actual 'product' that users are getting access to is at the `src/routes/tools/exampleproduct` path.

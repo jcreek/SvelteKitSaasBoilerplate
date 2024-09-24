@@ -1,16 +1,15 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import stripe from 'stripe';
-import { PUBLIC_STRIPE_SECRET_KEY } from '$env/static/public';
-import { PUBLIC_STRIPE_ENDPOINT_SECRET } from '$env/static/public';
+import { STRIPE_ENDPOINT_SECRET } from '$env/static/private';
 import {
 	deletePriceRecord,
 	deleteProductRecord,
 	manageSubscriptionStatusChange,
 	upsertPriceRecord,
-	upsertProductRecord
+	upsertProductRecord,
+	recordProductPurchase
 } from '$lib/utils/supabase/admin';
-
-const stripeClient = new stripe(PUBLIC_STRIPE_SECRET_KEY);
+import { stripe as stripeClient } from '$lib/utils/stripe';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.text();
@@ -23,13 +22,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Only verify the event if you have an endpoint secret defined.
 		// Otherwise use the basic event deserialized with JSON.parse
-		if (PUBLIC_STRIPE_ENDPOINT_SECRET && signature) {
+		if (STRIPE_ENDPOINT_SECRET && signature) {
 			try {
-				event = stripeClient.webhooks.constructEvent(
-					body,
-					signature,
-					PUBLIC_STRIPE_ENDPOINT_SECRET
-				);
+				event = stripeClient.webhooks.constructEvent(body, signature, STRIPE_ENDPOINT_SECRET);
 			} catch (err) {
 				console.error(`⚠️  Webhook signature verification failed.`, err.message);
 				return {
@@ -44,6 +39,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			case 'product.updated':
 				await upsertProductRecord(event.data.object as stripe.Product);
 				break;
+			case 'product.deleted':
+				await deleteProductRecord(event.data.object as stripe.Product);
+				break;
 			case 'price.created':
 			case 'price.updated':
 				await upsertPriceRecord(event.data.object as stripe.Price);
@@ -51,12 +49,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			case 'price.deleted':
 				await deletePriceRecord(event.data.object as stripe.Price);
 				break;
-			case 'product.deleted':
-				await deleteProductRecord(event.data.object as stripe.Product);
-				break;
 			case 'customer.subscription.created':
 			case 'customer.subscription.updated':
-			case 'customer.subscription.deleted': {
+			case 'customer.subscription.deleted':
+			case 'customer.subscription.paused':
+			case 'customer.subscription.resumed': {
 				const subscription = event.data.object as stripe.Subscription;
 				await manageSubscriptionStatusChange(
 					subscription.id,
@@ -67,6 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 			case 'checkout.session.completed': {
 				const checkoutSession = event.data.object as stripe.Checkout.Session;
+
 				if (checkoutSession.mode === 'subscription') {
 					const subscriptionId = checkoutSession.subscription;
 					await manageSubscriptionStatusChange(
@@ -74,22 +72,44 @@ export const POST: RequestHandler = async ({ request }) => {
 						checkoutSession.customer as string,
 						true
 					);
+				} else if (checkoutSession.mode === 'payment') {
+					// Fetch session with expanded line_items
+					const sessionWithLineItems = await stripeClient.checkout.sessions.retrieve(
+						checkoutSession.id,
+						{
+							expand: ['line_items']
+						}
+					);
+
+					const lineItems = sessionWithLineItems.line_items?.data;
+					const userId = checkoutSession.metadata!.userId;
+
+					if (!lineItems) {
+						throw new Error('No line items found in session');
+					}
+
+					if (!userId) {
+						throw new Error('No user ID found in session metadata');
+					}
+
+					for (const item of lineItems ?? []) {
+						const productId = item.price?.product as string;
+						const priceId = item.price?.id as string;
+
+						if (productId && priceId) {
+							await recordProductPurchase(userId, productId, priceId);
+						}
+					}
 				}
 				break;
 			}
 			default:
-				console.error(`Unhandled event type ${event.type}`);
+				console.log(`Unhandled event type ${event.type}`);
 		}
-
-		// Return a response to acknowledge receipt of the event
-		return new Response(JSON.stringify({ received: true }), {
-			status: 200
-		});
 	} catch (err) {
-		console.log(`Webhook Error: ${err.message}`);
-		return {
-			status: 400,
-			body: `Webhook Error: ${err.message}`
-		};
+		const message = err instanceof Error ? err.message : 'An unknown error has occurred';
+		return new Response(`Webhook Error: ${message}`, { status: 500 });
 	}
+
+	return json({ received: true });
 };

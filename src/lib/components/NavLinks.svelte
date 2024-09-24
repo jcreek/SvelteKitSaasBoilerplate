@@ -8,7 +8,7 @@
 		<div tabindex="0" role="button" class="">Parent</div>
 	{:else}
 		<details>
-			<summary>Parent</summary>
+			<summary class="flex items-center"><span class="mr-1">&#x25BC;</span>Parent </summary>
 		</details>
 	{/if}
 	<ul
@@ -20,4 +20,4 @@
 		<li><a href="/">Submenu 2</a></li>
 	</ul>
 </li>
-<li><a href="/">Item 3</a></li>
+<li><a href="/tools/exampleproduct">Example Product</a></li>
