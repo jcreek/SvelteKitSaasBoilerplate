@@ -8,7 +8,7 @@ export const GET = async ({ params }) => {
 
 	const price = await stripeClient.prices.retrieve(product.default_price);
 
-	const isSubscription = (price.type as Stripe.Price.type) === 'recurring';
+	const isSubscription = price.type === ('recurring' as Stripe.Price.type);
 	product.isSubscription = isSubscription;
 	return json(product);
 };
