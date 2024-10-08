@@ -55,3 +55,7 @@ Please see the Issues tab for `enhancement` tagged issues.
 ## [Database setup](/docs/database-setup.md)
 
 ## [Stripe webhook event listening](/docs/stripe-setup.md)
+
+## Testing the example credits management system
+
+There is an example system in this project for being able to manage credits that are sold to users. To test this system you can visit the `http://localhost:5173/test/test-credits` route. This will allow you to add credits to a user and then spend them by clicking the buttons on the page, and will show the user's credit balance updating in real time.
