@@ -298,6 +298,117 @@ const hasProductAccess = async (userId: string, productId: string) => {
 	return false;
 };
 
+const validateInput = (userId: string, credits: number, description: string) => {
+	if (!userId) throw new Error('User ID is required');
+	if (credits <= 0) throw new Error('Credits must be greater than zero');
+	if (!description) throw new Error('Description is required');
+};
+
+const logCreditTransaction = async (userId: string, creditsChange: number, description: string) => {
+	const { error } = await supabaseAdmin.from('credit_transactions').insert({
+		user_id: userId,
+		credits_change: creditsChange,
+		description,
+		created_at: new Date().toISOString()
+	});
+
+	if (error) {
+		throw new Error(`Error logging credit transaction: ${error.message}`);
+	}
+};
+
+const updateUserCredits = async (userId: string, creditsChange: number, description: string) => {
+	validateInput(userId, Math.abs(creditsChange), description);
+
+	const { data: creditData, error: fetchError } = await supabaseAdmin
+		.from('user_credits')
+		.select('credits_remaining, last_updated')
+		.eq('user_id', userId)
+		.single();
+
+	if (fetchError) {
+		throw new Error(`Error fetching credits: ${fetchError.message}`);
+	}
+
+	const newCreditTotal = (creditData?.credits_remaining || 0) + creditsChange;
+
+	if (newCreditTotal < 0) {
+		throw new Error('Insufficient credits');
+	}
+
+	const { error: upsertError } = await supabaseAdmin
+		.from('user_credits')
+		.upsert(
+			{
+				user_id: userId,
+				credits_remaining: newCreditTotal,
+				last_updated: new Date().toISOString()
+			},
+			{
+				onConflict: 'user_id'
+			}
+		)
+		.eq('last_updated', creditData?.last_updated); // Optimistic concurrency control
+
+	if (upsertError) {
+		throw new Error(`Error updating credits: ${upsertError.message}`);
+	}
+
+	await logCreditTransaction(userId, creditsChange, description);
+
+	console.log(
+		`${creditsChange > 0 ? 'Added' : 'Deducted'} ${Math.abs(creditsChange)} credits to user [${userId}]`
+	);
+};
+
+const addCredits = async (userId: string, creditsToAdd: number, description: string) => {
+	try {
+		await updateUserCredits(userId, creditsToAdd, description);
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const deductCredits = async (userId: string, creditsToDeduct: number, description: string) => {
+	try {
+		await updateUserCredits(userId, -creditsToDeduct, description);
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const getUserCredits = async (userId: string) => {
+	if (!userId) throw new Error('User ID is required');
+
+	// Fetch the user's credits from the user_credits table
+	const { data: creditData, error } = await supabaseAdmin
+		.from('user_credits')
+		.select('credits_remaining')
+		.eq('user_id', userId)
+		.single();
+
+	if (error && error.code !== 'PGRST116') {
+		// Code 'PGRST116' represents no rows found
+		throw new Error(`Error fetching credits: ${error.message}`);
+	}
+
+	if (!creditData) {
+		// If no row exists in the user_credits table, insert a new row for the user
+		const { error: insertError } = await supabaseAdmin.from('user_credits').insert({
+			user_id: userId,
+			credits_remaining: 0
+		});
+
+		if (insertError) {
+			throw new Error(`Error creating user credits: ${insertError.message}`);
+		}
+
+		return 0;
+	}
+
+	return creditData.credits_remaining;
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -306,5 +417,8 @@ export {
 	createOrRetrieveCustomer,
 	manageSubscriptionStatusChange,
 	recordProductPurchase,
-	hasProductAccess
+	hasProductAccess,
+	addCredits,
+	deductCredits,
+	getUserCredits
 };

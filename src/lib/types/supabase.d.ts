@@ -34,6 +34,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      credit_transactions: {
+        Row: {
+          created_at: string
+          credits_change: number
+          description: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_change: number
+          description?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_change?: number
+          description?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           id: string
@@ -263,6 +295,32 @@ export type Database = {
             foreignKeyName: "subscriptions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_credits: {
+        Row: {
+          credits_remaining: number
+          last_updated: string
+          user_id: string
+        }
+        Insert: {
+          credits_remaining?: number
+          last_updated?: string
+          user_id: string
+        }
+        Update: {
+          credits_remaining?: number
+          last_updated?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
