@@ -78,9 +78,6 @@
 				class="data w-full lg:pr-8 pr-0 xl:justify-start justify-center flex items-center max-lg:pb-10 xl:my-2 lg:my-5 my-0"
 			>
 				<div class="data w-full max-w-xl">
-					<!-- <p class="text-lg font-medium leading-8 text-indigo-600 mb-4">
-						Clothing&nbsp; /&nbsp; Menswear
-					</p> -->
 					<h2 class="font-manrope font-bold text-3xl leading-10 text-gray-900 mb-2 capitalize">
 						{item.name}
 					</h2>
@@ -270,33 +267,8 @@
 							<span class="font-normal text-base text-gray-900">all size is available</span>
 						</li>
 					</ul>
-					<!-- <p class="text-gray-900 text-lg leading-8 font-medium mb-4">Size</p>
-					<div class="w-full pb-8 border-b border-gray-100 flex-wrap">
-						<div class="grid grid-cols-3 min-[400px]:grid-cols-5 gap-3 max-w-md">
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>S</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>M</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>L</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>XL</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>XXL</button
-							>
-						</div>
-					</div> -->
 
-					{#if !item.isSubscription}
+					{#if !item.isSubscription && !hasPurchasedProduct}
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 py-8">
 							<div class="flex sm:items-center sm:justify-center w-full">
 								<button
@@ -366,7 +338,6 @@
 									</svg>
 								</button>
 							</div>
-							{#if !hasPurchasedProduct}
 							<button
 								class="group py-4 px-5 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500 hover:bg-indigo-100"
 								on:click={addToBasket}
@@ -388,58 +359,28 @@
 								</svg>
 								Add to basket
 							</button>
-						{:else}
-							<button
-								class="group py-4 px-5 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500 hover:bg-indigo-100"
-							>
-								<svg
-									class="stroke-indigo-600"
-									width="22"
-									height="22"
-									viewBox="0 0 22 22"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										d="M10.7394 17.875C10.7394 18.6344 10.1062 19.25 9.32511 19.25C8.54402 19.25 7.91083 18.6344 7.91083 17.875M16.3965 17.875C16.3965 18.6344 15.7633 19.25 14.9823 19.25C14.2012 19.25 13.568 18.6344 13.568 17.875M4.1394 5.5L5.46568 12.5908C5.73339 14.0221 5.86724 14.7377 6.37649 15.1605C6.88573 15.5833 7.61377 15.5833 9.06984 15.5833H15.2379C16.6941 15.5833 17.4222 15.5833 17.9314 15.1605C18.4407 14.7376 18.5745 14.0219 18.8421 12.5906L19.3564 9.84059C19.7324 7.82973 19.9203 6.8243 19.3705 6.16215C18.8207 5.5 17.7979 5.5 15.7522 5.5H4.1394ZM4.1394 5.5L3.66797 2.75"
-										stroke=""
-										stroke-width="1.6"
-										stroke-linecap="round"
-									/>
-								</svg>
-								You already own this
-							</button>
-						{/if}
 						</div>
 					{:else}
-						<div class="flex items-center gap-3">
-							<!-- <button
-							class="group transition-all duration-500 p-4 rounded-full bg-indigo-50 hover:bg-indigo-100 hover:shadow-sm hover:shadow-indigo-300"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="26"
-								height="26"
-								viewBox="0 0 26 26"
-								fill="none"
-							>
-								<path
-									d="M4.47084 14.3196L13.0281 22.7501L21.9599 13.9506M13.0034 5.07888C15.4786 2.64037 19.5008 2.64037 21.976 5.07888C24.4511 7.5254 24.4511 11.4799 21.9841 13.9265M12.9956 5.07888C10.5204 2.64037 6.49824 2.64037 4.02307 5.07888C1.54789 7.51738 1.54789 11.4799 4.02307 13.9184M4.02307 13.9184L4.04407 13.939M4.02307 13.9184L4.46274 14.3115"
-									stroke="#4F46E5"
-									stroke-width="1.6"
-									stroke-miterlimit="10"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-						</button> -->
-							<button
-								class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
-								on:click={startSubscription}
-							>
-								Subscribe
-							</button>
-						</div>
+						{#if hasPurchasedProduct}
+							<div class="flex items-center gap-3">
+								<button
+									class="group text-center w-full py-4 px-5 rounded-full bg-gray-100 text-gray-600 font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500"
+									disabled
+								>
+									You already own this
+								</button>
+							</div>
+						{/if}
+						{#if item.isSubscription}
+							<div class="flex items-center gap-3">
+								<button
+									class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
+									on:click={startSubscription}
+								>
+									Subscribe
+								</button>
+							</div>
+						{/if}
 					{/if}
 				</div>
 			</div>
