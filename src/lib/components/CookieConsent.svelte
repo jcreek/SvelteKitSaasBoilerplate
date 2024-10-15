@@ -1,17 +1,20 @@
 <script lang="ts">
-	import { isBrowser } from '@supabase/ssr';
+	import { onMount } from 'svelte';
 
 	export let cookiesAccepted;
-	let showBanner = !cookiesAccepted;
-	$: showBanner = !cookiesAccepted;
+	let showBanner = false;
+
+	onMount(() => {
+		if (!cookiesAccepted) {
+			const storedValue = localStorage.getItem('cookiesAccepted');
+			showBanner = storedValue !== 'true';
+		}
+	});
 
 	const acceptCookies = () => {
-		if (isBrowser()) {
-			localStorage.setItem('cookiesAccepted', 'true');
-			showBanner = false;
-		}
+		localStorage.setItem('cookiesAccepted', 'true');
+		showBanner = false;
 	};
-
 </script>
 
 {#if showBanner}
