@@ -438,7 +438,7 @@ const getActiveProductsWithPrices = async (limit = 10, offset = 0) => {
 		}
 	}
 
-	return { products, count }; // Return products and total count
+	return { products: products as ProductWithPrices[], count };
 };
 
 export {
