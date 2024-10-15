@@ -430,9 +430,7 @@ const getActiveProductsWithPrices = async (limit = 10, offset = 0) => {
 		throw new Error(`Error fetching products: ${error.message}`);
 	}
 
-	const typedProducts: ProductWithPrices[] = products;
-
-	for (const product of typedProducts) {
+	for (const product of products as ProductWithPrices[]) {
 		if (product.prices && product.prices.length > 0) {
 			// Assuming the default price is the first one
 			const defaultPrice = product.prices[0];
@@ -440,7 +438,7 @@ const getActiveProductsWithPrices = async (limit = 10, offset = 0) => {
 		}
 	}
 
-	return { products: typedProducts, count }; // Return products and total count
+	return { products, count }; // Return products and total count
 };
 
 export {
