@@ -409,6 +409,38 @@ const getUserCredits = async (userId: string) => {
 	return creditData.credits_remaining;
 };
 
+type ProductWithPrices = Product & {
+	prices: Price[];
+	actualPrice?: number;
+};
+
+const getActiveProductsWithPrices = async (limit = 10, offset = 0) => {
+	const {
+		data: products,
+		error,
+		count
+	} = await supabaseAdmin
+		.from('products')
+		.select('*, prices(*)', { count: 'exact' })
+		.eq('active', true)
+		.order('name', { ascending: true })
+		.range(offset, offset + limit - 1);
+
+	if (error) {
+		throw new Error(`Error fetching products: ${error.message}`);
+	}
+
+	for (const product of products as ProductWithPrices[]) {
+		if (product.prices && product.prices.length > 0) {
+			// Assuming the default price is the first one
+			const defaultPrice = product.prices[0];
+			product.actualPrice = defaultPrice.unit_amount! / 100;
+		}
+	}
+
+	return { products: products as ProductWithPrices[], count };
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -420,5 +452,6 @@ export {
 	hasProductAccess,
 	addCredits,
 	deductCredits,
-	getUserCredits
+	getUserCredits,
+	getActiveProductsWithPrices
 };
