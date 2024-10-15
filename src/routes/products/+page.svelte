@@ -6,12 +6,11 @@
 	let enablePagination = false;
 
 	onMount(async () => {
-		const response = await fetch('/products');
+		const response = await fetch('/products?limit=20&offset=0');
 		const responseJson = await response.json();
-		products = responseJson.data;
-		if (responseJson.has_more) {
-			enablePagination = true;
-		}
+		products = responseJson.products;
+		var count = responseJson.count;
+		// enablePagination needs to be set to true if there are more than 20 products
 	});
 </script>
 
