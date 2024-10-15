@@ -85,7 +85,7 @@
 						<h6
 							class="font-manrope font-semibold text-2xl leading-9 text-gray-900 pr-5 sm:border-r border-gray-200 mr-5"
 						>
-							£{item.price}
+							£{item.price} {item.isSubscription ? `/ ${item.interval}` : ''}
 						</h6>
 						<div class="flex items-center gap-2">
 							<div class="flex items-center gap-1">
