@@ -1,5 +1,8 @@
 <script lang="ts">
 	export let product;
+
+	const defaultPrice = product.prices[0];
+	const isSubscription = defaultPrice.type === 'recurring';
 </script>
 
 <a href="/products/{product.id}" class="max-w-[384px] mx-auto">
@@ -13,7 +16,7 @@
 	<div class="mt-5 flex items-center justify-between">
 		<div class="">
 			<h6 class="font-medium text-xl leading-8 text-black mb-2">{product.name}</h6>
-			<h6 class="font-semibold text-xl leading-8 text-indigo-600">£{product.actualPrice}</h6>
+			<h6 class="font-semibold text-xl leading-8 text-indigo-600">£{product.actualPrice} {isSubscription ? `/ ${defaultPrice.interval}` : ''}</h6>
 		</div>
 		<button
 			class="p-2 min-[400px]:p-4 rounded-full bg-white border border-gray-300 flex items-center justify-center group shadow-sm shadow-transparent transition-all duration-500 hover:shadow-gray-200 hover:border-gray-400 hover:bg-gray-50"

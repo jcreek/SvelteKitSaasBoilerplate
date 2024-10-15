@@ -11,6 +11,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	}
 
 	const userId = session.user.id;
+	const userEmail = session.user.email;
 
 	const formData = new URLSearchParams(await request.text());
 	const items: { priceId: string; quantity: number }[] = [];
@@ -26,6 +27,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	}));
 
 	const checkoutSession = await stripeClient.checkout.sessions.create({
+		customer_email: userEmail,
 		line_items: lineItems,
 		mode: 'payment',
 		success_url: `${request.headers.get('origin')}/checkout/success`,

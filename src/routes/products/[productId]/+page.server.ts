@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { hasProductAccess } from '$lib/utils/supabase/admin';
+import type { ProductInfo } from '$lib/types/Products/ProductInfo';
 
 export const load = async ({ params, locals: { safeGetSession }, fetch }) => {
 	const { session } = await safeGetSession();
@@ -8,7 +9,7 @@ export const load = async ({ params, locals: { safeGetSession }, fetch }) => {
 	}
 	
 	const productResponse = await fetch(`/products/${params.productId}`);
-	const product = await productResponse.json();
+	const { product, isSubscription, price }: ProductInfo = await productResponse.json();
 	
 	// Create the item object
 	const item = {
@@ -17,17 +18,13 @@ export const load = async ({ params, locals: { safeGetSession }, fetch }) => {
 		categoryDescription: product.description,
 		imgAlt: product.description,
 		imgSrc: product.images[0],
-		price: 0,
 		priceId: product.default_price,
 		quantity: 1,
-		isSubscription: product.isSubscription
+		isSubscription: isSubscription,
+		price: (price.unit_amount ? price.unit_amount / 100 : NaN),
+		interval: price.recurring ? price.recurring.interval : null,
 	}
-
-	// Fetch the price of the product
-	const priceResponse = await fetch(`/products/prices/${product.default_price}`);
-	const price = await priceResponse.json();
-	// Set the price of the product
-	item.price = price.unit_amount / 100;
+	
 
 	// Check if the user has access to the 'EXAMPLE PRODUCT' product
 	const hasPurchasedProduct = await hasProductAccess(session.user.id, params.productId);
