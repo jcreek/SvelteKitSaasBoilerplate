@@ -1,10 +1,14 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy } from 'svelte';
+	import { redirect } from '@sveltejs/kit';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 	import { general } from '$lib/stores/generalStore.js';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
+
+	let { supabase, session, hasPurchasedProduct, item } = data;
+	$: ({ supabase, session, hasPurchasedProduct, item } = data);
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
@@ -16,6 +20,9 @@
 	});
 
 	function addToBasket() {
+		if (!session) {
+			redirect(303, '/');
+		}
 		basket.update((value) => {
 			const existingItemIndex = value.items.findIndex((basketItem) => basketItem.id === item.id);
 
@@ -57,33 +64,6 @@
 				console.log(data);
 			});
 	}
-
-	let item = {};
-
-	onMount(() => {
-		fetch(`/products/${data.productId}`)
-			.then((response) => response.json())
-			.then((product) => {
-				item = {
-					id: product.id,
-					name: product.name,
-					categoryDescription: product.description,
-					imgAlt: product.description,
-					imgSrc: product.images[0],
-					price: 0,
-					priceId: product.default_price,
-					quantity: 1,
-					isSubscription: product.isSubscription
-				};
-
-				// Fetch the price of the product
-				fetch(`/products/prices/${product.default_price}`)
-					.then((response) => response.json())
-					.then((price) => {
-						item.price = price.unit_amount / 100;
-					});
-			});
-	});
 </script>
 
 <section class="relative">
@@ -98,9 +78,6 @@
 				class="data w-full lg:pr-8 pr-0 xl:justify-start justify-center flex items-center max-lg:pb-10 xl:my-2 lg:my-5 my-0"
 			>
 				<div class="data w-full max-w-xl">
-					<!-- <p class="text-lg font-medium leading-8 text-indigo-600 mb-4">
-						Clothing&nbsp; /&nbsp; Menswear
-					</p> -->
 					<h2 class="font-manrope font-bold text-3xl leading-10 text-gray-900 mb-2 capitalize">
 						{item.name}
 					</h2>
@@ -290,33 +267,8 @@
 							<span class="font-normal text-base text-gray-900">all size is available</span>
 						</li>
 					</ul>
-					<!-- <p class="text-gray-900 text-lg leading-8 font-medium mb-4">Size</p>
-					<div class="w-full pb-8 border-b border-gray-100 flex-wrap">
-						<div class="grid grid-cols-3 min-[400px]:grid-cols-5 gap-3 max-w-md">
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>S</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>M</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>L</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>XL</button
-							>
-							<button
-								class="bg-white text-center py-1.5 px-6 w-full font-semibold text-lg leading-8 text-gray-900 border border-gray-200 flex items-center rounded-full justify-center transition-all duration-300 hover:bg-gray-50 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 visited:border-gray-300 visited:bg-gray-50"
-								>XXL</button
-							>
-						</div>
-					</div> -->
 
-					{#if !item.isSubscription}
+					{#if !item.isSubscription && !hasPurchasedProduct}
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 py-8">
 							<div class="flex sm:items-center sm:justify-center w-full">
 								<button
@@ -405,38 +357,30 @@
 										stroke-linecap="round"
 									/>
 								</svg>
-								Add to basket</button
-							>
-						</div>
-					{:else}
-						<div class="flex items-center gap-3">
-							<!-- <button
-							class="group transition-all duration-500 p-4 rounded-full bg-indigo-50 hover:bg-indigo-100 hover:shadow-sm hover:shadow-indigo-300"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="26"
-								height="26"
-								viewBox="0 0 26 26"
-								fill="none"
-							>
-								<path
-									d="M4.47084 14.3196L13.0281 22.7501L21.9599 13.9506M13.0034 5.07888C15.4786 2.64037 19.5008 2.64037 21.976 5.07888C24.4511 7.5254 24.4511 11.4799 21.9841 13.9265M12.9956 5.07888C10.5204 2.64037 6.49824 2.64037 4.02307 5.07888C1.54789 7.51738 1.54789 11.4799 4.02307 13.9184M4.02307 13.9184L4.04407 13.939M4.02307 13.9184L4.46274 14.3115"
-									stroke="#4F46E5"
-									stroke-width="1.6"
-									stroke-miterlimit="10"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-						</button> -->
-							<button
-								class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
-								on:click={startSubscription}
-							>
-								Subscribe
+								Add to basket
 							</button>
 						</div>
+					{:else}
+						{#if hasPurchasedProduct}
+							<div class="flex items-center gap-3">
+								<button
+									class="group text-center w-full py-4 px-5 rounded-full bg-gray-100 text-gray-600 font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500"
+									disabled
+								>
+									You already own this
+								</button>
+							</div>
+						{/if}
+						{#if item.isSubscription}
+							<div class="flex items-center gap-3">
+								<button
+									class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
+									on:click={startSubscription}
+								>
+									Subscribe
+								</button>
+							</div>
+						{/if}
 					{/if}
 				</div>
 			</div>
