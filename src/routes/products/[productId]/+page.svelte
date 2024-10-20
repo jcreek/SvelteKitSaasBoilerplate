@@ -50,20 +50,6 @@
 			});
 		}, 5000);
 	}
-
-	function startSubscription() {
-		fetch('/api/subscribe', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ priceId: item.priceId })
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-			});
-	}
 </script>
 
 <section class="relative">
@@ -85,7 +71,8 @@
 						<h6
 							class="font-manrope font-semibold text-2xl leading-9 text-gray-900 pr-5 sm:border-r border-gray-200 mr-5"
 						>
-							£{item.price} {item.isSubscription ? `/ ${item.interval}` : ''}
+							£{item.price}
+							{item.isSubscription ? `/ ${item.interval}` : ''}
 						</h6>
 						<div class="flex items-center gap-2">
 							<div class="flex items-center gap-1">
@@ -373,12 +360,15 @@
 						{/if}
 						{#if item.isSubscription}
 							<div class="flex items-center gap-3">
-								<button
-									class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
-									on:click={startSubscription}
-								>
-									Subscribe
-								</button>
+								<form method="POST" action="/api/subscribe">
+									<input type="hidden" name="priceId" value={item.priceId} />
+									<button
+										type="submit"
+										class="text-center w-full px-5 py-4 rounded-[100px] bg-indigo-600 flex items-center justify-center font-semibold text-lg text-white shadow-sm transition-all duration-500 hover:bg-indigo-700 hover:shadow-indigo-400"
+									>
+										Subscribe
+									</button>
+								</form>
 							</div>
 						{/if}
 					{/if}
