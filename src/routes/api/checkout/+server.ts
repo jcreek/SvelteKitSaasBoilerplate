@@ -27,6 +27,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	}));
 
 	const checkoutSession = await stripeClient.checkout.sessions.create({
+		customer_creation: 'always',
 		customer_email: userEmail,
 		line_items: lineItems,
 		mode: 'payment',
