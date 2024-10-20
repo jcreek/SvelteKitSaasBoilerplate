@@ -15,8 +15,9 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	const userId = session.user.id;
 	const userEmail = session.user.email;
 
-	// Get the price ID from the request body
-	const { priceId } = await request.json();
+	// Get the price ID from the request form data
+	const formData = await request.formData();
+	const priceId = formData.get('priceId');
 
 	if (!priceId) {
 		return new Response('Price ID is required', { status: 400 });
