@@ -1,5 +1,7 @@
 import { type RequestHandler, redirect } from '@sveltejs/kit';
 import { stripe as stripeClient } from '$lib/utils/stripe';
+import { getStripeCustomerId } from '$lib/utils/supabase/admin';
+import type Stripe from 'stripe';
 
 // Create a checkout session
 export const POST: RequestHandler = async ({ request, cookies, locals: { safeGetSession } }) => {
@@ -26,9 +28,16 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 		quantity: item.quantity
 	}));
 
-	const checkoutSession = await stripeClient.checkout.sessions.create({
-		customer_creation: 'always',
-		customer_email: userEmail,
+	let stripeCustomerId = null;
+
+	// Get the existing Stripe customer ID from Supabase, if it exists
+	try {
+		stripeCustomerId = await getStripeCustomerId(userEmail!, userId);
+	} catch (error) {
+		console.error('Error fetching Stripe customer ID:', error);
+	}
+
+	const stripeCheckoutSessionObject = {
 		line_items: lineItems,
 		mode: 'payment',
 		success_url: `${request.headers.get('origin')}/checkout/success`,
@@ -36,7 +45,18 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 		metadata: {
 			userId: userId
 		}
-	});
+	} as Stripe.Checkout.SessionCreateParams;
+
+	if (stripeCustomerId) {
+		// If the user has a Stripe customer ID, attach it to the checkout session
+		stripeCheckoutSessionObject.customer = stripeCustomerId;
+	} else {
+		// If the user doesn't have a Stripe customer ID, create a new customer
+		stripeCheckoutSessionObject.customer_creation = 'always';
+		stripeCheckoutSessionObject.customer_email = userEmail;
+	}
+
+	const checkoutSession = await stripeClient.checkout.sessions.create(stripeCheckoutSessionObject);
 
 	// Store the checkout session.id for access from the frontend
 	cookies.set('checkout_session_id', checkoutSession.id, { path: '/' });
