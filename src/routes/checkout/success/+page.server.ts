@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import Stripe from 'stripe';
 import { getProductById } from '$lib/utils/supabase/admin';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load = async ({ fetch }) => {
 	const response = await fetch('/api/checkout/status');
 	if (!response.ok) {
 		console.error('Failed to fetch checkout status');
