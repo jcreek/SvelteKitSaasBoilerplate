@@ -1,11 +1,11 @@
 <script src="https://js.stripe.com/v3/" lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
+	import { basket, type Basket } from '$lib/stores/basket.js';
 	import BasketItem from '$lib/components/checkout/BasketItem.svelte';
 
 	export let data;
-	let { supabase, session, url } = data;
-	$: ({ supabase, session, url } = data);
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
 
 	let localBasket: Basket;
 	const unsubscribe = basket.subscribe((value) => {
