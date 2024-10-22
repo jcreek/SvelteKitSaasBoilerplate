@@ -2,8 +2,8 @@ import type { PageLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import Stripe from 'stripe';
 
-export const load: PageLoad = async ({fetch}) => {
-  const response = await fetch('/api/checkout/status');
+export const load: PageLoad = async ({ fetch }) => {
+	const response = await fetch('/api/checkout/status');
 	if (!response.ok) {
 		console.error('Failed to fetch checkout status');
 		return;
@@ -18,10 +18,18 @@ export const load: PageLoad = async ({fetch}) => {
 		throw redirect(303, '/checkout/cancelled');
 	}
 
+	// Save the stripe customer id in the customers table
+	const stripeCustomerId = checkoutSession.customer as string;
+	const createCustomerResponse = await fetch(
+		'/api/checkout/create-customer?stripeCustomerId=' + stripeCustomerId
+	);
+	if (!createCustomerResponse.ok) {
+		console.error('Failed to create customer');
+	}
+
 	return {
 		checkoutSession,
 		lineItems,
 		paymentStatus
 	};
 };
-

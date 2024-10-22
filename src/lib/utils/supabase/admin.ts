@@ -110,6 +110,31 @@ const createCustomerInStripe = async (uuid: string, email: string) => {
 	return newCustomer.id;
 };
 
+const getStripeCustomerId = async (email: string, uuid: string) => {
+	const { data: existingSupabaseCustomer, error: queryError } = await supabaseAdmin
+		.from('customers')
+		.select('*')
+		.eq('id', uuid)
+		.maybeSingle();
+
+	if (queryError) {
+		throw new Error(`Supabase customer lookup failed: ${queryError.message}`);
+	}
+
+	let stripeCustomerId: string | undefined;
+	if (existingSupabaseCustomer?.stripe_customer_id) {
+		const existingStripeCustomer = await stripeClient.customers.retrieve(
+			existingSupabaseCustomer.stripe_customer_id
+		);
+		stripeCustomerId = existingStripeCustomer.id;
+	} else {
+		const stripeCustomers = await stripeClient.customers.list({ email: email });
+		stripeCustomerId = stripeCustomers.data.length > 0 ? stripeCustomers.data[0].id : undefined;
+	}
+
+	return stripeCustomerId;
+};
+
 const createOrRetrieveCustomer = async ({ email, uuid }: { email: string; uuid: string }) => {
 	// Check if the customer already exists in Supabase
 	const { data: existingSupabaseCustomer, error: queryError } = await supabaseAdmin
@@ -453,5 +478,7 @@ export {
 	addCredits,
 	deductCredits,
 	getUserCredits,
-	getActiveProductsWithPrices
+	getActiveProductsWithPrices,
+	upsertCustomerToSupabase,
+	getStripeCustomerId
 };
