@@ -466,6 +466,20 @@ const getActiveProductsWithPrices = async (limit = 10, offset = 0) => {
 	return { products: products as ProductWithPrices[], count };
 };
 
+const getProductById = async (productId: string) => {
+	const { data: product, error } = await supabaseAdmin
+		.from('products')
+		.select('*')
+		.eq('id', productId)
+		.single();
+
+	if (error) {
+		throw new Error(`Error fetching product: ${error.message}`);
+	}
+
+	return product as Product;
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -479,6 +493,7 @@ export {
 	deductCredits,
 	getUserCredits,
 	getActiveProductsWithPrices,
+	getProductById,
 	upsertCustomerToSupabase,
 	getStripeCustomerId
 };
