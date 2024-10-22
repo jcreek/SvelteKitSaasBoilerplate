@@ -50,10 +50,6 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	if (stripeCustomerId) {
 		// If the user has a Stripe customer ID, attach it to the checkout session
 		stripeCheckoutSessionObject.customer = stripeCustomerId;
-	} else {
-		// If the user doesn't have a Stripe customer ID, create a new customer
-		stripeCheckoutSessionObject.customer_creation = 'always';
-		stripeCheckoutSessionObject.customer_email = userEmail;
 	}
 
 	// Create a subscription checkout session with Stripe
