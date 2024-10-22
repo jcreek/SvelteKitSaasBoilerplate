@@ -76,11 +76,11 @@
       <!-- User Account Dropdown -->
       <Dropdown posRight>
         <div slot="dropdown">
-          <div class="btn btn-ghost btn-circle avatar">
+          <div class="btn btn-ghost btn-circle avatar placeholder">
             <div class="w-10 rounded-full">
               {#if session?.user}
                 <div class="user-circle text-primary-content border-primary-content">
-                  {session?.user.email ? session?.user.email[0].toUpperCase() : '?'}
+                  <span class="text-xl">{session?.user.email ? session?.user.email[0].toUpperCase() : '?'}</span>
                 </div>
               {:else}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
