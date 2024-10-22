@@ -30,7 +30,7 @@
 
 <ul class="flex space-x-4">
 	{#each links as link}
-		<li class="relative">
+		<li>
 			{#if link.isParent}
 				<NavLinkParent text={link.text} children={link.children} />
 			{:else}

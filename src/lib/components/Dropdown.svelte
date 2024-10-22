@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
   export let indicator: boolean = false;
+  export let posRight: boolean = false;
 
   let isOpen = false;
   let dropdown: HTMLDivElement;
@@ -27,7 +28,7 @@
   });
 </script>
 
-<div bind:this={dropdown}>
+<div bind:this={dropdown} class="relative">
   <div class="dropdown-title">
     <button class="flex" on:click={() => isOpen = !isOpen}>
       {#if indicator}
@@ -36,7 +37,7 @@
       <slot name="dropdown"></slot>
     </button>
   </div>
-  <ul class:flex={isOpen} class:hidden={!isOpen} class="absolute rounded-box w-52 shadow z-[1] menu p-2 bg-base-100 text-base-content">
+  <ul class:flex={isOpen} class:hidden={!isOpen} class:right-0={posRight} class="absolute rounded-box min-w-52 shadow z-[1] menu p-2 bg-base-100 text-base-content">
     <slot />
   </ul>
 </div>
