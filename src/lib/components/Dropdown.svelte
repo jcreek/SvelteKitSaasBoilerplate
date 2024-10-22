@@ -13,10 +13,8 @@
 
   onMount(() => {
     const handleClick = (event: MouseEvent) => {
-      if (!dropdown.contains(event.target as Node) && isOpen) {
-        isOpen = false;
-      }
-      if (event.target instanceof HTMLAnchorElement) {
+      if (!isOpen) return;
+      if (!dropdown.contains(event.target as Node) || event.target instanceof HTMLAnchorElement) {
         isOpen = false;
       }
     };
