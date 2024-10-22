@@ -2,7 +2,7 @@
 	import { formatCurrency } from '$lib/utils/currency';
 	export let imgAlt = '';
 	export let imgSrc = '';
-	// export let itemCategoryDescription = '';
+	export let itemCategoryDescription = '';
 	export let itemName = '';
 	export let price = 0;
 	export let quantity = 0;
@@ -20,11 +20,11 @@
 			<h5 class="font-semibold text-xl leading-8 text-black max-[550px]:text-center">
 				{itemName}
 			</h5>
-			<!-- <p
+			<p
 				class="font-normal text-lg leading-8 text-gray-500 my-2 min-[550px]:my-3 max-[550px]:text-center"
 			>
 				{itemCategoryDescription}
-			</p> -->
+			</p>
 
 			<div class="flex items-center">
 				<h6

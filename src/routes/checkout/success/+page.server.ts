@@ -1,9 +1,9 @@
-import type { PageLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import Stripe from 'stripe';
+import { getProductById } from '$lib/utils/supabase/admin';
 
-export const load: PageLoad = async ({fetch}) => {
-  const response = await fetch('/api/checkout/status');
+export const load = async ({ fetch }) => {
+	const response = await fetch('/api/checkout/status');
 	if (!response.ok) {
 		console.error('Failed to fetch checkout status');
 		return;
@@ -18,10 +18,19 @@ export const load: PageLoad = async ({fetch}) => {
 		throw redirect(303, '/checkout/cancelled');
 	}
 
+	for (const lineItem of lineItems as LineItemForCheckout[]) {
+		const product = await getProductById(lineItem.price?.product.toString() ?? '');
+		lineItem.imgSrc = product.images ? product.images[0] : '';
+		lineItem.productDescription = product.description ?? '';
+	}
+
 	return {
 		checkoutSession,
-		lineItems,
-		paymentStatus
+		lineItems
 	};
 };
 
+type LineItemForCheckout = Stripe.LineItem & {
+	imgSrc: string;
+	productDescription: string;
+};

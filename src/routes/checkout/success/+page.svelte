@@ -11,7 +11,7 @@
 		localBasket = value;
 	});
 
-	let { checkoutSession, lineItems, paymentStatus } = data;
+	let { checkoutSession, lineItems } = data;
 
 	onDestroy(unsubscribe);
 
@@ -64,13 +64,15 @@
 				>
 			</div> -->
 			<div class="w-full px-3 min-[400px]:px-6">
-				{#if lineItems.length == 0}
+				{#if lineItems !== undefined && lineItems.length == 0}
 					<p class="font-semibold text-lg leading-7 text-black text-center">
 						No items in the basket
 					</p>
-				{:else}
+				{:else if lineItems !== undefined}
 					{#each lineItems as item (item.id)}
 						<OrderConfirmationItem
+							imgSrc={item.imgSrc}
+							itemCategoryDescription={item.productDescription}
 							itemName={item.description}
 							price={item.price.unit_amount / 100}
 							quantity={item.quantity}
