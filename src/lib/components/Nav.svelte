@@ -25,10 +25,9 @@
   });
 </script>
 
+
 <nav class="bg-primary text-primary-content p-4">
   <div class="container mx-auto flex justify-between items-center">
-    <a href="/" class="text-white font-bold text-xl">SvelteKit SaaS Boilerplate</a>
-
     <!-- Hamburger Menu Button (Mobile) -->
     <button on:click={toggleMobileMenu} class="block md:hidden text-white focus:outline-none">
       <svg
@@ -47,12 +46,8 @@
       </svg>
     </button>
 
-    <!-- Navbar Links (hidden on mobile, visible on larger screens) -->
-    <div class="hidden md:flex space-x-4">
-      <ul class="flex flex-col md:flex-row md:space-x-4">
-        <NavLinks isMobile={false} />
-      </ul>
-    </div>
+    <a href="/" class="text-white font-bold text-xl">SvelteKit SaaS Boilerplate</a>
+    <NavLinks />
 
     <!-- Right Side: Basket & User Account -->
     <div class="flex items-center space-x-4">
@@ -83,7 +78,7 @@
           <div class="w-10 rounded-full">
             {#if session?.user}
               <div class="user-circle text-primary-content border-primary-content">
-                {session?.user.email[0].toUpperCase()}
+                {session?.user.email ? session?.user.email[0].toUpperCase() : '?'}
               </div>
             {:else}
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -115,16 +110,5 @@
         {/if}
       </details>
     </div>
-  </div>
-
-  <!-- Mobile Menu -->
-  <div
-    class="bg-base-100 text-base-content shadow rounded-box p-4 transition duration-300 ease-in-out md:hidden"
-    class:block={isMobileMenuOpen}
-    class:hidden={!isMobileMenuOpen}
-  >
-    <ul class="flex flex-col space-y-4">
-      <NavLinks isMobile={true} />
-    </ul>
   </div>
 </nav>

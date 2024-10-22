@@ -1,23 +1,41 @@
 <script lang="ts">
-	export let isMobile: boolean = false;
+	import { type NavLinkItem } from '$lib/types/Nav/NavLinkItem';
+	import NavLinkParent from './NavLinkParent.svelte';
+
+	const links: NavLinkItem[] = [
+		{
+			text: 'Products',
+			href: '/products',
+		},
+		{
+			text: 'Parent',
+			isParent: true,
+			children: [
+				{
+					text: 'Submenu 1',
+					href: '/',
+				},
+				{
+					text: 'Submenu 2',
+					href: '/',
+				},
+			],
+		},
+		{
+			text: 'Example Product',
+			href: '/tools/exampleproduct',
+		},
+	];
 </script>
 
-<li><a href="/products">Products</a></li>
-<li class={isMobile ? '' : 'dropdown'}>
-	{#if isMobile}
-		<div tabindex="0" role="button" class="">Parent</div>
-	{:else}
-		<details>
-			<summary class="flex items-center"><span class="mr-1">&#x25BC;</span>Parent </summary>
-		</details>
-	{/if}
-	<ul
-		class="{isMobile
-			? ''
-			: 'dropdown-content rounded-box w-52 shadow'} z-[1] menu p-2 bg-base-100 text-base-content"
-	>
-		<li><a href="/">Submenu 1</a></li>
-		<li><a href="/">Submenu 2</a></li>
-	</ul>
-</li>
-<li><a href="/tools/exampleproduct">Example Product</a></li>
+<ul class="flex space-x-4">
+	{#each links as link}
+		<li class="relative">
+			{#if link.isParent}
+				<NavLinkParent text={link.text} children={link.children} />
+			{:else}
+				<a href={link.href}>{link.text}</a>
+			{/if}
+		</li>
+	{/each}
+</ul>
