@@ -20,7 +20,6 @@ export const load: PageLoad = async ({ fetch }) => {
 
 	// Save the stripe customer id in the customers table
 	const stripeCustomerId = checkoutSession.customer as string;
-	console.log('stripeCustomerId', stripeCustomerId);
 	const createCustomerResponse = await fetch(
 		'/api/checkout/create-customer?stripeCustomerId=' + stripeCustomerId
 	);
