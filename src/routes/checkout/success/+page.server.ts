@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import Stripe from 'stripe';
 import { getProductById } from '$lib/utils/supabase/admin';
 
-export const load = async ({ fetch }) => {
+export const load: PageLoad = async ({ fetch }) => {
 	const response = await fetch('/api/checkout/status');
 	if (!response.ok) {
 		console.error('Failed to fetch checkout status');
@@ -22,6 +22,15 @@ export const load = async ({ fetch }) => {
 		const product = await getProductById(lineItem.price?.product.toString() ?? '');
 		lineItem.imgSrc = product.images ? product.images[0] : '';
 		lineItem.productDescription = product.description ?? '';
+	}
+
+	// Save the stripe customer id in the customers table
+	const stripeCustomerId = checkoutSession.customer as string;
+	const createCustomerResponse = await fetch(
+		'/api/checkout/create-customer?stripeCustomerId=' + stripeCustomerId
+	);
+	if (!createCustomerResponse.ok) {
+		console.error('Failed to create customer');
 	}
 
 	return {
