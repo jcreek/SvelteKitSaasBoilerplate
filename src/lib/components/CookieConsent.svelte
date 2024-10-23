@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { cubicInOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 
 	export let cookiesAccepted;
 	let showBanner = false;
@@ -18,7 +20,10 @@
 </script>
 
 {#if showBanner}
-	<div class="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4">
+	<div
+		class="fixed bottom-0 left-0 w-full bg-gray-800 text-white p-4"
+		transition:slide={{ duration: 200, easing: cubicInOut }}
+	>
 		<p class="text-sm">
 			We use cookies to ensure you get the best experience on our website. By continuing, you agree
 			to our use of cookies.

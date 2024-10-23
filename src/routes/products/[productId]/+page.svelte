@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { redirect } from '@sveltejs/kit';
-	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
+	import { basket, type Basket } from '$lib/stores/basket.js';
 	import { general } from '$lib/stores/generalStore.js';
 
 	/** @type {import('./$types').PageData} */

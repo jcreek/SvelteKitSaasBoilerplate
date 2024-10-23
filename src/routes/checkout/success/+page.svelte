@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
+	import { basket, type Basket } from '$lib/stores/basket.js';
 	import OrderConfirmationItem from '$lib/components/checkout/OrderConfirmationItem.svelte';
 	import { formatCurrency } from '$lib/utils/currency';
 	import type { PageData } from './$types';
