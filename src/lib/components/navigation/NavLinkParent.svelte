@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type NavLinkItem } from '$lib/types/Nav/NavLinkItem';
 	import { cubicInOut } from 'svelte/easing';
-	import Dropdown from './Dropdown.svelte';
+	import Dropdown from '../Dropdown.svelte';
 	import { slide } from 'svelte/transition';
 
 	export let text: string;

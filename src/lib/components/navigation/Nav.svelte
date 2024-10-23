@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Session, SupabaseClient } from '@supabase/supabase-js';
-	import MagicLink from './MagicLink.svelte';
+	import MagicLink from '../MagicLink.svelte';
 	import NavLinks from './NavLinks.svelte';
-	import SignOut from './SignOut.svelte';
-	import Dropdown from './Dropdown.svelte';
+	import SignOut from '../SignOut.svelte';
+	import Dropdown from '../Dropdown.svelte';
 	import { basket, type Basket } from '$lib/stores/basket.js';
 	import { onDestroy } from 'svelte';
 

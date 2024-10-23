@@ -5,7 +5,7 @@
 	import { general } from '$lib/stores/generalStore.js';
 	import { invalidate } from '$app/navigation';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
-	import Nav from '$lib/components/Nav.svelte';
+	import Nav from '$lib/components/navigation/Nav.svelte';
 	import { slide } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 
