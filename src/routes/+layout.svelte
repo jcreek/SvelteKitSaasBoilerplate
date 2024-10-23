@@ -6,12 +6,12 @@
 	import { invalidate } from '$app/navigation';
 	import CookieConsent from '$lib/components/CookieConsent.svelte';
 	import Nav from '$lib/components/Nav.svelte';
+	import { slide } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
 
 	export let data;
 	let { supabase, session } = data;
 	$: ({ supabase, session } = data);
-
-	
 
 	let localGeneral: any;
 	const unsubscribeToGeneralStore = general.subscribe((value) => {
@@ -40,10 +40,6 @@
 
 		return () => data.subscription.unsubscribe();
 	});
-
-	
-
-	
 </script>
 
 <svelte:head>
@@ -126,52 +122,53 @@
 	</nav>
 </footer>
 
-<div
-	id={localGeneral.toastType == 'success' ? 'success-toast' : 'error-toast'}
-	role="alert"
-	class="alert {localGeneral.toastType == 'success'
-		? 'alert-success'
-		: 'alert-error'} fixed top-20 right-3 max-w-52 text-white {localGeneral.hideToast
-		? 'hidden'
-		: ''}"
->
-	{#if localGeneral.toastType == 'success'}
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			class="stroke-current shrink-0 h-6 w-6"
-			fill="none"
-			viewBox="0 0 24 24"
-			><path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-			/></svg
-		>
-	{:else}
-		<svg
-			class="stroke-current shrink-0 h-6 w-6"
-			viewBox="0 0 32 32"
-			xml:space="preserve"
-			xmlns="http://www.w3.org/2000/svg"
-			xmlns:xlink="http://www.w3.org/1999/xlink"
-			><g
-				><g id="Error_1_"
-					><g id="Error">
-						<circle cx="16" cy="16" id="BG" r="16" style="fill:#E6E6E6;" />
-						<path
-							d="M14.5,25h3v-3h-3V25z M14.5,6v13h3V6H14.5z"
-							id="Exclamatory_x5F_Sign"
-							style="fill:#D72828;"
-						/>
-					</g>
-				</g></g
-			></svg
-		>
-	{/if}
+{#if !localGeneral.hideToast}
+	<div
+		id={localGeneral.toastType == 'success' ? 'success-toast' : 'error-toast'}
+		role="alert"
+		class="alert {localGeneral.toastType == 'success'
+			? 'alert-success'
+			: 'alert-error'} fixed top-20 right-3 max-w-52 text-white"
+		transition:slide={{ duration: 200, easing: cubicInOut }}
+	>
+		{#if localGeneral.toastType == 'success'}
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="stroke-current shrink-0 h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+				/></svg
+			>
+		{:else}
+			<svg
+				class="stroke-current shrink-0 h-6 w-6"
+				viewBox="0 0 32 32"
+				xml:space="preserve"
+				xmlns="http://www.w3.org/2000/svg"
+				xmlns:xlink="http://www.w3.org/1999/xlink"
+				><g
+					><g id="Error_1_"
+						><g id="Error">
+							<circle cx="16" cy="16" id="BG" r="16" style="fill:#E6E6E6;" />
+							<path
+								d="M14.5,25h3v-3h-3V25z M14.5,6v13h3V6H14.5z"
+								id="Exclamatory_x5F_Sign"
+								style="fill:#D72828;"
+							/>
+						</g>
+					</g></g
+				></svg
+			>
+		{/if}
 
-	<span>{localGeneral.toastMessage == '' ? 'Added to basket' : localGeneral.toastMessage}</span>
-</div>
+		<span>{localGeneral.toastMessage == '' ? 'Added to basket' : localGeneral.toastMessage}</span>
+	</div>
+{/if}
 
 <style scoped lang="postcss">
 	.user-circle {

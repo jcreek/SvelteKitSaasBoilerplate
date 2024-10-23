@@ -1,43 +1,51 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { cubicInOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 
-  export let indicator: boolean = false;
-  export let posRight: boolean = false;
+	export let indicator: boolean = false;
+	export let posRight: boolean = false;
 
-  let isOpen = false;
-  let dropdown: HTMLDivElement;
-  
-  const DropdownIcon = {
+	let isOpen = false;
+	let dropdown: HTMLDivElement;
+
+	const DropdownIcon = {
     closed: '&#x25BC;',
-    open: '&#x25B2;'
-  };
+		open: '&#x25B2;'
+	};
 
-  onMount(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (!isOpen) return;
-      if (!dropdown.contains(event.target as Node) || event.target instanceof HTMLAnchorElement) {
-        isOpen = false;
-      }
-    };
+	onMount(() => {
+		const handleClick = (event: MouseEvent) => {
+			if (!isOpen) return;
+			if (!dropdown.contains(event.target as Node) || event.target instanceof HTMLAnchorElement) {
+				isOpen = false;
+			}
+		};
 
-    document.addEventListener('click', handleClick);
+		document.addEventListener('click', handleClick);
 
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  });
+		return () => {
+			document.removeEventListener('click', handleClick);
+		};
+	});
 </script>
 
-<div bind:this={dropdown} class="relative">
-  <div class="dropdown-title">
-    <button class="flex" on:click={() => isOpen = !isOpen}>
-      {#if indicator}
-        <span class="mr-1">{@html isOpen ? DropdownIcon.open : DropdownIcon.closed }</span>
-      {/if}
-      <slot name="dropdown"></slot>
-    </button>
-  </div>
-  <ul class:flex={isOpen} class:hidden={!isOpen} class:right-0={posRight} class="absolute rounded-box min-w-52 shadow z-[1] menu p-2 bg-base-100 text-base-content">
-    <slot />
-  </ul>
+<div bind:this={dropdown} class="relative block">
+	<div class="dropdown-title block w-full">
+		<button class="flex w-full" on:click={() => (isOpen = !isOpen)}>
+			{#if indicator}
+				<span class="mr-1">{@html isOpen ? DropdownIcon.open : DropdownIcon.closed}</span>
+			{/if}
+			<slot name="dropdown"></slot>
+		</button>
+	</div>
+	{#if isOpen}
+		<ul
+			class:right-0={posRight}
+			class="absolute rounded-box min-w-52 shadow z-[1] m-0 menu p-2 bg-base-100 text-base-content block"
+			transition:slide={{ duration: 200, easing: cubicInOut }}
+		>
+			<slot />
+		</ul>
+	{/if}
 </div>
