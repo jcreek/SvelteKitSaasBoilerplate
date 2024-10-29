@@ -4,6 +4,7 @@ import type { Database, Tables, TablesInsert } from '$lib/types/supabase';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { stripe as stripeClient } from '$lib/utils/stripe';
+import { sendEmail } from '../brevo/email';
 
 const toDateTime = (secs: number) => {
 	const t = new Date(+0); // Unix epoch start.
@@ -494,18 +495,17 @@ const requestAccountDeletion = async (userId: string, userEmail: string, baseUrl
 	const deletionLink = `${baseUrl}/api/delete-account?token=${token}`;
 
 	// Send deletion email using Brevo
-	// try {
-	// 	await brevoClient.sendTransactionalEmail({
-	// 		to: [{ email: userEmail }],
-	// 		subject: 'Confirm Account Deletion',
-	// 		htmlContent: `<p>Click <a href="${deletionLink}">here</a> to confirm your account deletion.</p>`
-	// 	});
-	// 	console.log('Deletion email sent successfully.');
-	// } catch (emailError) {
-	// 	console.error('Failed to send deletion email:', emailError);
-	// 	throw new Error('Failed to send confirmation email.');
-	// }
-	console.log('Deletion email would be sent successfully.', deletionLink);
+	try {
+		await sendEmail(
+			'Confirm Account Deletion',
+			`<p>Click <a href="${deletionLink}">here</a> to confirm your account deletion.</p>`,
+			userEmail
+		);
+		console.log('Deletion email sent successfully.');
+	} catch (emailError) {
+		console.error('Failed to send deletion email:', emailError);
+		throw new Error('Failed to send confirmation email.');
+	}
 };
 
 const deleteAccount = async (token: string) => {
