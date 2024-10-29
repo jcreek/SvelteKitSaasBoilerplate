@@ -4,43 +4,39 @@
 	import NavLinkParent from './NavLinkParent.svelte';
 	import type SupabaseClient from '@supabase/supabase-js/dist/module/SupabaseClient';
 
-    export let session: Session | null;
-    export let supabase: SupabaseClient | null = null;
+	export let session: Session | null;
+	export let supabase: SupabaseClient | null = null;
 	export let isMobile = false;
 
-    const userAccountLinks: NavLinkItem[] = [];
+	const userAccountLinks: NavLinkItem[] = [];
 
-    if (isMobile) {
-        if (session) {
-            userAccountLinks.push(
-                {
-                    text: 'User', // TODO - replace with user's name - will require a database call to get the user's name - suggest setting up a user model to store user data.
-                    isParent: true,
-                    isUserAccount: true,
-                    children: [
-                        {
-                            text: 'Account',
-                            href: '/account'
-                        },
-                        {
-                            text: 'Sign Out',
-                            isSignout: true
-                        }
-                    ]
-                }
-            );
-        } else {
-            userAccountLinks.push(
-                {
-                    text: 'Log in',
-                    href: '/login'
-                },
-            );
-        }
-    }
+	if (isMobile) {
+		if (session) {
+			userAccountLinks.push({
+				text: 'User', // TODO - replace with user's name - will require a database call to get the user's name - suggest setting up a user model to store user data.
+				isParent: true,
+				isUserAccount: true,
+				children: [
+					{
+						text: 'Account',
+						href: '/account'
+					},
+					{
+						text: 'Sign Out',
+						isSignout: true
+					}
+				]
+			});
+		} else {
+			userAccountLinks.push({
+				text: 'Log in',
+				href: '/login'
+			});
+		}
+	}
 
 	const links: NavLinkItem[] = [
-        ...userAccountLinks,
+		...userAccountLinks,
 		{
 			text: 'Products',
 			href: '/products'

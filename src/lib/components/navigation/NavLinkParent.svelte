@@ -8,8 +8,7 @@
 
 	export let linkItem: NavLinkItem;
 	export let isMobile: boolean;
-    export let supabase: SupabaseClient | null;
-    
+	export let supabase: SupabaseClient | null;
 
 	let isOpen = false;
 </script>
@@ -35,7 +34,7 @@
 			transition:slide={{ duration: 200, easing: cubicInOut }}
 		>
 			{#each linkItem.children ?? [] as child (child.text.replace(' ', '-').toLowerCase())}
-                <li><NavLink linkItem={child} {supabase} /></li>
+				<li><NavLink linkItem={child} {supabase} /></li>
 			{/each}
 		</ul>
 	{/if}
