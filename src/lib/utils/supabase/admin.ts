@@ -480,6 +480,55 @@ const getProductById = async (productId: string) => {
 	return product as Product;
 };
 
+const requestAccountDeletion = async (userId: string, userEmail: string, baseUrl: string) => {
+	const token = crypto.randomUUID();
+
+	const { error: insertError } = await supabaseAdmin.from('account_deletion_requests').upsert({
+		user_id: userId,
+		token,
+		requested_at: new Date().toISOString()
+	});
+
+	if (insertError) throw new Error(`Account deletion request failed: ${insertError.message}`);
+
+	const deletionLink = `${baseUrl}/api/delete-account?token=${token}`;
+
+	// Send deletion email using Brevo
+	// try {
+	// 	await brevoClient.sendTransactionalEmail({
+	// 		to: [{ email: userEmail }],
+	// 		subject: 'Confirm Account Deletion',
+	// 		htmlContent: `<p>Click <a href="${deletionLink}">here</a> to confirm your account deletion.</p>`
+	// 	});
+	// 	console.log('Deletion email sent successfully.');
+	// } catch (emailError) {
+	// 	console.error('Failed to send deletion email:', emailError);
+	// 	throw new Error('Failed to send confirmation email.');
+	// }
+	console.log('Deletion email would be sent successfully.', deletionLink);
+};
+
+const deleteAccount = async (token: string) => {
+	// Verify the token
+	const { data: deletionRequest, error } = await supabaseAdmin
+		.from('account_deletion_requests')
+		.select('user_id')
+		.eq('token', token)
+		.single();
+
+	if (error || !deletionRequest) {
+		return new Response('Invalid or expired token', { status: 400 });
+	}
+
+	// N.B. The SQL here will either cascade delete or nullify the foreign key constraints depending on the table, to enable anonymisation
+	const { error: deletionError } = await supabaseAdmin.auth.admin.deleteUser(
+		deletionRequest.user_id
+	);
+	if (deletionError) {
+		throw new Error(`Failed to delete user: ${deletionError.message}`);
+	}
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -495,5 +544,7 @@ export {
 	getActiveProductsWithPrices,
 	getProductById,
 	upsertCustomerToSupabase,
-	getStripeCustomerId
+	getStripeCustomerId,
+	requestAccountDeletion,
+	deleteAccount
 };

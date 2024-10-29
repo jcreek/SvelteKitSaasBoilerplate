@@ -26,6 +26,16 @@
 			update();
 		};
 	};
+
+	const handleAccountDeletion: SubmitFunction = () => {
+		loading = true;
+		if (session.user && session.user.email) {
+			alert('Check your email to confirm account deletion.');
+		}
+		return async () => {
+			loading = false;
+		};
+	};
 </script>
 
 <div class="form-widget">
@@ -54,6 +64,12 @@
 	<form method="post" action="?/signout" use:enhance={handleSignOut}>
 		<div>
 			<button class="button block" disabled={loading}>Sign Out</button>
+		</div>
+	</form>
+
+	<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
+		<div>
+			<button class="button block" disabled={loading}>Delete My Account</button>
 		</div>
 	</form>
 </div>
