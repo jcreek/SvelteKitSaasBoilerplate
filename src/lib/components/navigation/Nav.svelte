@@ -21,6 +21,7 @@
 </script>
 
 <nav class="bg-primary text-primary-content p-4">
+    <!-- Nav Container -->
 	<div class="container mx-auto flex justify-between items-center">
 		<!-- Hamburger Menu Button (Mobile) -->
 		<div class="lg:hidden mr-4">
@@ -47,6 +48,7 @@
 				<NavLinks isMobile {session} {supabase} />
 			</Dropdown>
 		</div>
+        <!-- Logo -->
 		<a href="/" class="text-white font-bold text-xl">SvelteKit SaaS Boilerplate</a>
 		<div class="hidden lg:block">
 			<NavLinks {session} />

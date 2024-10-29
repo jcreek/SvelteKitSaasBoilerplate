@@ -17,7 +17,7 @@
 {#if !isMobile}
 	<Dropdown indicator>
 		<div slot="dropdown">{linkItem.text}</div>
-		{#each linkItem.children ?? [] as child}
+		{#each linkItem.children ?? [] as child (child.text.replace(' ', '-').toLowerCase())}
 			<li><NavLink linkItem={child} /></li>
 		{/each}
 	</Dropdown>
@@ -34,7 +34,7 @@
 			class="menu-dropdown menu-dropdown-show"
 			transition:slide={{ duration: 200, easing: cubicInOut }}
 		>
-			{#each linkItem.children ?? [] as child}
+			{#each linkItem.children ?? [] as child (child.text.replace(' ', '-').toLowerCase())}
                 <li><NavLink linkItem={child} {supabase} /></li>
 			{/each}
 		</ul>
