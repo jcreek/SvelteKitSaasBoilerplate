@@ -10,7 +10,7 @@
 	let dropdown: HTMLDivElement;
 
 	const DropdownIcon = {
-    closed: '&#x25BC;',
+        closed: '&#x25BC;',
 		open: '&#x25B2;'
 	};
 
