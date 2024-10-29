@@ -3,19 +3,22 @@
 	import { cubicInOut } from 'svelte/easing';
 	import Dropdown from '../Dropdown.svelte';
 	import { slide } from 'svelte/transition';
+	import NavLink from './NavLink.svelte';
+	import type { SupabaseClient } from '@supabase/supabase-js';
 
-	export let text: string;
-	export let children: NavLinkItem[] | undefined;
+	export let linkItem: NavLinkItem;
 	export let isMobile: boolean;
+    export let supabase: SupabaseClient | null;
+    
 
 	let isOpen = false;
 </script>
 
 {#if !isMobile}
 	<Dropdown indicator>
-		<div slot="dropdown">{text}</div>
-		{#each children ?? [] as child}
-			<li><a href={child.href}>{child.text}</a></li>
+		<div slot="dropdown">{linkItem.text}</div>
+		{#each linkItem.children ?? [] as child}
+			<li><NavLink linkItem={child} /></li>
 		{/each}
 	</Dropdown>
 {:else}
@@ -24,15 +27,15 @@
 		class="menu-dropdown-toggle"
 		on:click={() => (isOpen = !isOpen)}
 	>
-		{text}
+		{linkItem.text}
 	</button>
 	{#if isOpen}
 		<ul
 			class="menu-dropdown menu-dropdown-show"
 			transition:slide={{ duration: 200, easing: cubicInOut }}
 		>
-			{#each children ?? [] as child}
-				<li><a href={child.href}>{child.text}</a></li>
+			{#each linkItem.children ?? [] as child}
+                <li><NavLink linkItem={child} {supabase} /></li>
 			{/each}
 		</ul>
 	{/if}

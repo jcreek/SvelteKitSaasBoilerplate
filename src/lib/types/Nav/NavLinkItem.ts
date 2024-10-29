@@ -3,4 +3,6 @@ export interface NavLinkItem {
   href?: string;
   isParent?: boolean;
   children?: NavLinkItem[];
+  isSignout?: boolean;
+  isUserAccount?: boolean;
 }
