@@ -13,7 +13,7 @@
 	if (isMobile) {
 		if (session) {
 			userAccountLinks.push({
-				text: 'User', // TODO - replace with user's name - will require a database call to get the user's name - suggest setting up a user model to store user data.
+				text: 'User', // TODO - #62 replace with user's name - will require a database call to get the user's name - suggest setting up a user model to store user data.
 				isParent: true,
 				isUserAccount: true,
 				children: [
