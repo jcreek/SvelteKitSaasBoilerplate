@@ -15,17 +15,17 @@
 	};
 
 	onMount(() => {
-		const handleClick = (event: MouseEvent) => {
+		const handleClickAnywhere = (event: MouseEvent) => {
 			if (!isOpen) return;
 			if (!dropdown.contains(event.target as Node) || event.target instanceof HTMLAnchorElement) {
 				isOpen = false;
 			}
 		};
 
-		document.addEventListener('click', handleClick);
+		document.addEventListener('click', handleClickAnywhere);
 
 		return () => {
-			document.removeEventListener('click', handleClick);
+			document.removeEventListener('click', handleClickAnywhere);
 		};
 	});
 </script>
