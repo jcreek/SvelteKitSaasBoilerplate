@@ -27,27 +27,23 @@ export const actions: Actions = {
 		if (!session) {
 			return fail(401, { name });
 		}
-		const { error } = await supabase.from('users').update({
-			name: name,
-		}).eq('id', session?.user.id);
+		const { error } = await supabase
+			.from('users')
+			.update({
+				name: name
+			})
+			.eq('id', session?.user.id);
 
 		console.error(error);
 
 		if (error) {
 			return fail(500, {
-				name,
+				name
 			});
 		}
 
 		return {
-			name,
+			name
 		};
-	},
-	signout: async ({ locals: { supabase, safeGetSession } }) => {
-		const { session } = await safeGetSession();
-		if (session) {
-			await supabase.auth.signOut();
-			redirect(303, '/');
-		}
 	}
 };
