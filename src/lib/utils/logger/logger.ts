@@ -32,9 +32,9 @@ const logger = createLogger({
 });
 
 // Uncomment this for testing your initial logging setup
-logger.log({
-	level: 'info',
-	message: 'Logger successfully setup'
-});
+// logger.log({
+// 	level: 'info',
+// 	message: 'Logger successfully setup'
+// });
 
 export default logger;
