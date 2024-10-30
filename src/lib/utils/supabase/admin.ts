@@ -4,6 +4,7 @@ import type { Database, Tables, TablesInsert } from '$lib/types/supabase';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { stripe as stripeClient } from '$lib/utils/stripe';
+import logger from '$lib/utils/logger/logger';
 
 const toDateTime = (secs: number) => {
 	const t = new Date(+0); // Unix epoch start.
@@ -39,7 +40,7 @@ const upsertProductRecord = async (product: stripe.Product) => {
 
 	const { error: upsertError } = await supabaseAdmin.from('products').upsert([productData]);
 	if (upsertError) throw new Error(`Product insert/update failed: ${upsertError.message}`);
-	console.log(`Product inserted/updated: ${product.id}`);
+	logger.info(`Product inserted/updated: ${product.id}`);
 };
 
 const upsertPriceRecord = async (price: stripe.Price, retryCount = 0, maxRetries = 3) => {
@@ -61,7 +62,7 @@ const upsertPriceRecord = async (price: stripe.Price, retryCount = 0, maxRetries
 
 	if (upsertError?.message.includes('foreign key constraint')) {
 		if (retryCount < maxRetries) {
-			console.log(`Retry attempt ${retryCount + 1} for price ID: ${price.id}`);
+			logger.info(`Retry attempt ${retryCount + 1} for price ID: ${price.id}`);
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 			await upsertPriceRecord(price, retryCount + 1, maxRetries);
 		} else {
@@ -72,7 +73,7 @@ const upsertPriceRecord = async (price: stripe.Price, retryCount = 0, maxRetries
 	} else if (upsertError) {
 		throw new Error(`Price insert/update failed: ${upsertError.message}`);
 	} else {
-		console.log(`Price inserted/updated: ${price.id}`);
+		logger.info(`Price inserted/updated: ${price.id}`);
 	}
 };
 
@@ -82,13 +83,13 @@ const deleteProductRecord = async (product: stripe.Product) => {
 		.delete()
 		.eq('id', product.id);
 	if (deletionError) throw new Error(`Product deletion failed: ${deletionError.message}`);
-	console.log(`Product deleted: ${product.id}`);
+	logger.info(`Product deleted: ${product.id}`);
 };
 
 const deletePriceRecord = async (price: stripe.Price) => {
 	const { error: deletionError } = await supabaseAdmin.from('prices').delete().eq('id', price.id);
 	if (deletionError) throw new Error(`Price deletion failed: ${deletionError.message}`);
-	console.log(`Price deleted: ${price.id}`);
+	logger.info(`Price deleted: ${price.id}`);
 };
 
 const upsertCustomerToSupabase = async (uuid: string, customerId: string) => {
@@ -258,7 +259,7 @@ const manageSubscriptionStatusChange = async (
 		.from('subscriptions')
 		.upsert([subscriptionData]);
 	if (upsertError) throw new Error(`Subscription insert/update failed: ${upsertError.message}`);
-	console.log(`Inserted/updated subscription [${subscription.id}] for user [${uuid}]`);
+	logger.info(`Inserted/updated subscription [${subscription.id}] for user [${uuid}]`);
 
 	// // For a new subscription copy the billing details to the customer object.
 	// // NOTE: This is a costly operation and should happen at the very end.
@@ -271,7 +272,7 @@ const manageSubscriptionStatusChange = async (
 };
 
 const recordProductPurchase = async (userId: string, productId: string, priceId: string) => {
-	console.log(
+	logger.info(
 		`Recording product purchase for user [${userId}] and product [${productId}] with price [${priceId}]`
 	);
 
@@ -284,10 +285,10 @@ const recordProductPurchase = async (userId: string, productId: string, priceId:
 			throw new Error(`Failed to record product purchase: ${error.message}`);
 		}
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 	}
 
-	console.log(`Product purchased recorded for user [${userId}] and product [${productId}]`);
+	logger.info(`Product purchased recorded for user [${userId}] and product [${productId}]`);
 };
 
 const hasProductAccess = async (userId: string, productId: string) => {
@@ -381,7 +382,7 @@ const updateUserCredits = async (userId: string, creditsChange: number, descript
 
 	await logCreditTransaction(userId, creditsChange, description);
 
-	console.log(
+	logger.info(
 		`${creditsChange > 0 ? 'Added' : 'Deducted'} ${Math.abs(creditsChange)} credits to user [${userId}]`
 	);
 };
@@ -390,7 +391,7 @@ const addCredits = async (userId: string, creditsToAdd: number, description: str
 	try {
 		await updateUserCredits(userId, creditsToAdd, description);
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 	}
 };
 
@@ -398,7 +399,7 @@ const deductCredits = async (userId: string, creditsToDeduct: number, descriptio
 	try {
 		await updateUserCredits(userId, -creditsToDeduct, description);
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 	}
 };
 

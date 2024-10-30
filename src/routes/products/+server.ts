@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { getActiveProductsWithPrices } from '$lib/utils/supabase/admin';
+import logger from '$lib/utils/logger/logger';
 
 export const GET = async ({ url }) => {
 	try {
@@ -13,7 +14,7 @@ export const GET = async ({ url }) => {
 
 		return json({ products, count });
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 		return json({ error: error.message }, { status: 500 });
 	}
 };
