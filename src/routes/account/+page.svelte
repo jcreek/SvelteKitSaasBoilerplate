@@ -5,7 +5,7 @@
 	export let data;
 	export let form;
 
-	let { session, supabase, user } = data;
+	let { session, user, subscriptions, transactions } = data;
 	$: ({ session, supabase, user } = data);
 
 	let profileForm: HTMLFormElement;
@@ -18,16 +18,6 @@
 			loading = false;
 		};
 	};
-
-	const subscriptions = [
-		{ name: 'Premium Plan', nextBillingDate: '12th August 2021' },
-		{ name: 'Basic Plan', nextBillingDate: '12th August 2021' }
-	];
-
-	const billingHistory = [
-		{ id: 123, date: '12th August 2021', amount: 9.99, downloadLink: '#' },
-		{ id: 122, date: '12th July 2021', amount: 9.99, downloadLink: '#' }
-	];
 </script>
 
 <div
@@ -35,7 +25,7 @@
 >
 	<!-- Flex container for two columns -->
 	<div class="flex flex-col lg:flex-row gap-6">
-		<!-- Left Column: Account Overview, Active Subscriptions, and Billing History -->
+		<!-- Left Column: Account Overview, Subscriptions, and Billing History -->
 		<div class="flex-1 space-y-6">
 			<!-- Account Overview -->
 			<section class="space-y-4">
@@ -83,35 +73,50 @@
 
 			<!-- Active Subscriptions -->
 			<section class="space-y-4">
-				<h2 class="text-xl font-semibold">Active Subscriptions</h2>
-				<ul class="space-y-3">
-					{#each subscriptions as subscription}
-						<li class="p-4 border border-gray-200 rounded-md">
-							<div class="flex items-center justify-between">
-								<div>
-									<p class="font-semibold">{subscription.name}</p>
-									<p class="text-sm text-gray-500">Renewal Date: {subscription.nextBillingDate}</p>
+				<h2 class="text-xl font-semibold">Subscriptions</h2>
+				{#if subscriptions.length === 0}
+					<p class="text-gray-600">You do not have any subscriptions.</p>
+				{:else}
+					<ul class="space-y-3">
+						{#each subscriptions as subscription}
+							<li class="p-4 border border-gray-200 rounded-md">
+								<div class="flex items-center justify-between">
+									<div>
+										<p class="font-semibold">{subscription.productName}</p>
+										<p class="text-sm text-gray-500">
+											Price: {subscription.amount}
+											{subscription.currency} / {subscription.interval}
+										</p>
+										<p class="text-sm text-gray-500">
+											Expiry Date: {subscription.expiryDate}
+										</p>
+										<p class="text-sm text-gray-500">
+											Status: {subscription.status}
+										</p>
+									</div>
+									<!-- <button class="btn btn-secondary btn-sm">Manage</button> -->
 								</div>
-								<button class="btn btn-secondary btn-sm">Manage</button>
-							</div>
-						</li>
-					{/each}
-				</ul>
+							</li>
+						{/each}
+					</ul>
+				{/if}
 			</section>
 
 			<!-- Billing History -->
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Billing History</h2>
 				<ul class="space-y-3">
-					{#each billingHistory as invoice}
+					{#each transactions as transaction}
 						<li class="flex justify-between p-4 border border-gray-200 rounded-md">
 							<div>
-								<p class="font-semibold">Invoice #{invoice.id}</p>
-								<p class="text-sm text-gray-500">Date: {invoice.date}</p>
-								<p class="text-sm text-gray-500">Amount: £{invoice.amount}</p>
+								<p class="text-sm text-gray-500">Date: {transaction.created}</p>
+								<p class="text-sm text-gray-500">
+									Amount: {transaction.amount}
+									{transaction.currency}
+								</p>
 							</div>
-							<a href={invoice.downloadLink} class="btn btn-outline btn-sm" target="_blank"
-								>Download</a
+							<a href={transaction.receipt_url} class="btn btn-outline btn-sm" target="_blank"
+								>Download Receipt</a
 							>
 						</li>
 					{/each}
