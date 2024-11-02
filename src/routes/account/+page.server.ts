@@ -23,8 +23,19 @@ export const actions: Actions = {
 		const { session } = await safeGetSession();
 		const baseUrl = url.origin;
 		if (session) {
-			await requestAccountDeletion(session.user.id, session.user.email!, baseUrl);
-			return {};
+			if (!session.user.email) {
+				return fail(400, { message: 'Email is required for account deletion' });
+			}
+			try {
+				await requestAccountDeletion(session.user.id, session.user.email, baseUrl);
+				return {
+					success: true,
+					message: 'Account deletion request submitted successfully'
+				};
+			} catch (error) {
+				console.error('Failed to request account deletion:', error);
+				return fail(500, { message: 'Failed to process deletion request' });
+			}
 		} else {
 			redirect(303, '/');
 		}
