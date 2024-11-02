@@ -83,6 +83,8 @@ To do so without resetting the database, you can use the following command:
 
 `npx supabase migration up`
 
+> Use this command when you want to preserve existing data whilst applying new schema changes. For a fresh start with test data, use `npx supabase db reset` instead.
+
 And for the database in the cloud:
 
 `npx supabase db push`
