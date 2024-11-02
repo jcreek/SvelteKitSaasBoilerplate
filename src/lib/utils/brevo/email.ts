@@ -7,6 +7,9 @@ import {
 
 const apiInstance = new brevo.TransactionalEmailsApi();
 const apiKey = apiInstance.authentications['apiKey'];
+if (!VITE_BREVO_API_KEY) {
+  throw new Error('Brevo API key is not configured');
+}
 apiKey.apiKey = VITE_BREVO_API_KEY;
 
 const sendEmail = async (subject: string, htmlContentString: string, toAddress: string) => {
