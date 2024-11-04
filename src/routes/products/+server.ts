@@ -14,7 +14,14 @@ export const GET = async ({ url }) => {
 
 		return json({ products, count });
 	} catch (error) {
-		logger.error(error);
+		logger.error('Failed to fetch products', {
+			error: error.message,
+			stack: error.stack,
+			params: {
+				limit: limitParam,
+				offset: offsetParam
+			}
+		});
 		return json({ error: error.message }, { status: 500 });
 	}
 };
