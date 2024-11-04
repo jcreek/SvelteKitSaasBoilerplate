@@ -500,8 +500,6 @@ const getUserSubscriptions = async (userId: string) => {
 				const product = await stripeClient.products.retrieve(sub.product_id);
 				const price = await stripeClient.prices.retrieve(sub.price_id);
 
-				console.log(sub);
-
 				const expiryDate = new Date(sub.current_period_end);
 
 				// Format output data
