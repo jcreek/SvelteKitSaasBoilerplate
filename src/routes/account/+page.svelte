@@ -106,24 +106,26 @@
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Billing History</h2>
 				<ul class="space-y-3">
-					{#each transactions as transaction}
-						<li class="flex justify-between p-4 border border-gray-200 rounded-md">
-							<div>
-								<p class="text-sm text-gray-500">Date: {transaction.created}</p>
-								<p class="text-sm text-gray-500">
-									Amount: {transaction.amount}
-									{transaction.currency}
-								</p>
-							</div>
-							{#if transaction.receipt_url}
-								<a href={transaction.receipt_url} class="btn btn-outline btn-sm" target="_blank">
-									Download Receipt
-								</a>
-							{:else}
-								<span class="text-gray-500">Receipt unavailable</span>
-							{/if}
-						</li>
-					{/each}
+					{#if transactions}
+						{#each transactions as transaction}
+							<li class="flex justify-between p-4 border border-gray-200 rounded-md">
+								<div>
+									<p class="text-sm text-gray-500">Date: {transaction.created}</p>
+									<p class="text-sm text-gray-500">
+										Amount: {transaction.amount}
+										{transaction.currency}
+									</p>
+								</div>
+								{#if transaction.receipt_url}
+									<a href={transaction.receipt_url} class="btn btn-outline btn-sm" target="_blank">
+										Download Receipt
+									</a>
+								{:else}
+									<span class="text-gray-500">Receipt unavailable</span>
+								{/if}
+							</li>
+						{/each}
+					{/if}
 				</ul>
 			</section>
 		</div>
