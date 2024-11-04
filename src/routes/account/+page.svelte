@@ -115,9 +115,13 @@
 									{transaction.currency}
 								</p>
 							</div>
-							<a href={transaction.receipt_url} class="btn btn-outline btn-sm" target="_blank"
-								>Download Receipt</a
-							>
+							{#if transaction.receipt_url}
+								<a href={transaction.receipt_url} class="btn btn-outline btn-sm" target="_blank">
+									Download Receipt
+								</a>
+							{:else}
+								<span class="text-gray-500">Receipt unavailable</span>
+							{/if}
 						</li>
 					{/each}
 				</ul>
