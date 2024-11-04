@@ -35,7 +35,12 @@ export const actions: Actions = {
 			})
 			.eq('id', session?.user.id);
 
-		logger.error(error);
+		if (error) {
+			logger.error('Failed to update user name', {
+				userId: session?.user.id,
+				error
+			});
+		}
 
 		if (error) {
 			return fail(500, {
