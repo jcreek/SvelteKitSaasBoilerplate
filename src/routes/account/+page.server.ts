@@ -39,11 +39,13 @@ export const actions: Actions = {
 			})
 			.eq('id', session?.user.id);
 
-		console.error(error);
+		console.error('Failed to update user:', error);
 
 		if (error) {
 			return fail(500, {
-				name
+				name,
+				message: 'Failed to update profile',
+				error: error.message
 			});
 		}
 
