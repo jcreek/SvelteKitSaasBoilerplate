@@ -10,6 +10,7 @@ import {
 	recordProductPurchase
 } from '$lib/utils/supabase/admin';
 import { stripe as stripeClient } from '$lib/utils/stripe';
+import logger from '$lib/utils/logger/logger';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.text();
@@ -26,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			try {
 				event = stripeClient.webhooks.constructEvent(body, signature, STRIPE_ENDPOINT_SECRET);
 			} catch (err) {
-				console.error(`⚠️  Webhook signature verification failed.`, err.message);
+				logger.error(`⚠️  Webhook signature verification failed.`, err.message);
 				return {
 					status: 400,
 					body: {}
@@ -104,7 +105,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 			}
 			default:
-				console.log(`Unhandled event type ${event.type}`);
+				logger.info(`Unhandled event type ${event.type}`);
 		}
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'An unknown error has occurred';

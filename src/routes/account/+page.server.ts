@@ -1,5 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import logger from '$lib/utils/logger/logger';
+import { getUserSubscriptions, getUserTransactions } from '$lib/utils/supabase/admin';
 import { requestAccountDeletion } from '$lib/utils/supabase/admin';
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
@@ -15,7 +17,11 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 		.eq('id', session.user.id)
 		.single();
 
-	return { session, user };
+	const subscriptions = await getUserSubscriptions(session.user.id);
+
+	const transactions = await getUserTransactions(session.user.id);
+
+	return { session, user, subscriptions, transactions };
 };
 
 export const actions: Actions = {
@@ -56,7 +62,12 @@ export const actions: Actions = {
 			})
 			.eq('id', session?.user.id);
 
-		console.error(error);
+		if (error) {
+			logger.error('Failed to update user name', {
+				userId: session?.user.id,
+				error
+			});
+		}
 
 		if (error) {
 			return fail(500, {

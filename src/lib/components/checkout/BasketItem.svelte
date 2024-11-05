@@ -11,10 +11,11 @@
 	export let price = 0;
 	export let quantity = 0;
 
+	$: dispatch('changeQuantity', { itemId, quantity });
+
 	function reduceQuantityByOne() {
 		if (quantity > 1) {
 			quantity--;
-			dispatch('changeQuantity', { itemId, quantity });
 		} else {
 			dispatch('removeItem', { itemId });
 		}
@@ -22,7 +23,6 @@
 
 	function increaseQuantityByOne() {
 		quantity++;
-		dispatch('changeQuantity', { itemId, quantity });
 	}
 </script>
 
