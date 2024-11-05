@@ -255,10 +255,17 @@ const manageSubscriptionStatusChange = async (
 		trial_end: subscription.trial_end ? toDateTime(subscription.trial_end).toISOString() : null
 	};
 
-	const { error: upsertError } = await supabaseAdmin
-		.from('subscriptions')
-		.upsert([subscriptionData]);
-	if (upsertError) throw new Error(`Subscription insert/update failed: ${upsertError.message}`);
+	try {
+		const { error: upsertError } = await supabaseAdmin
+			.from('subscriptions')
+			.upsert([subscriptionData]);
+		if (upsertError) {
+			throw new Error(`Subscription insert/update failed: ${upsertError.message}`);
+		}
+	} catch (error) {
+		logger.error(error);
+	}
+
 	logger.info(`Inserted/updated subscription [${subscription.id}] for user [${uuid}]`);
 
 	// // For a new subscription copy the billing details to the customer object.
@@ -293,32 +300,40 @@ const recordProductPurchase = async (userId: string, productId: string, priceId:
 
 const hasProductAccess = async (userId: string, productId: string) => {
 	// Check if user has purchased the product
-	const { data: purchases, error: purchaseError } = await supabaseAdmin
-		.from('purchases')
-		.select('*')
-		.eq('user_id', userId)
-		.eq('product_id', productId);
+	try {
+		const { data: purchases, error: purchaseError } = await supabaseAdmin
+			.from('purchases')
+			.select('*')
+			.eq('user_id', userId)
+			.eq('product_id', productId);
 
-	if (purchaseError) throw new Error(purchaseError.message);
+		if (purchaseError) throw new Error(purchaseError.message);
 
-	if (purchases && purchases.length > 0) {
-		// User has purchased the product
-		return true;
+		if (purchases && purchases.length > 0) {
+			// User has purchased the product
+			return true;
+		}
+	} catch (error) {
+		logger.error(error);
 	}
 
 	// Check if user has an active subscription for the product
-	const { data: subscriptions, error: subError } = await supabaseAdmin
-		.from('subscriptions')
-		.select('*')
-		.eq('user_id', userId)
-		.eq('product_id', productId)
-		.in('status', ['active', 'trialing']);
+	try {
+		const { data: subscriptions, error: subError } = await supabaseAdmin
+			.from('subscriptions')
+			.select('*')
+			.eq('user_id', userId)
+			.eq('product_id', productId)
+			.in('status', ['active', 'trialing']);
 
-	if (subError) throw new Error(subError.message);
+		if (subError) throw new Error(subError.message);
 
-	if (subscriptions && subscriptions.length > 0) {
-		// User has an active subscription
-		return true;
+		if (subscriptions && subscriptions.length > 0) {
+			// User has an active subscription
+			return true;
+		}
+	} catch (error) {
+		logger.error(error);
 	}
 
 	return false;
@@ -490,7 +505,7 @@ const getUserSubscriptions = async (userId: string) => {
 			.eq('user_id', userId);
 
 		if (error) {
-			console.error('Error retrieving subscriptions:', error.message);
+			logger.error('Error retrieving subscriptions:', error.message);
 			throw new Error('Failed to fetch subscriptions');
 		}
 
@@ -521,7 +536,7 @@ const getUserSubscriptions = async (userId: string) => {
 
 		return subscriptionDetails;
 	} catch (error) {
-		console.error('An error occurred while retrieving subscription details:', error);
+		logger.error('An error occurred while retrieving subscription details:', error);
 		throw new Error('Could not retrieve subscription details');
 	}
 };
