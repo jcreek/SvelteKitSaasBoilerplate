@@ -481,6 +481,94 @@ const getProductById = async (productId: string) => {
 	return product as Product;
 };
 
+const getUserSubscriptions = async (userId: string) => {
+	try {
+		// Step 1: Retrieve subscription data
+		const { data: subscriptions, error } = await supabaseAdmin
+			.from('subscriptions')
+			.select('*')
+			.eq('user_id', userId);
+
+		if (error) {
+			console.error('Error retrieving subscriptions:', error.message);
+			throw new Error('Failed to fetch subscriptions');
+		}
+
+		// Step 2: Map through each subscription and fetch product and price details
+		const subscriptionDetails = await Promise.all(
+			subscriptions.map(async (sub) => {
+				// Fetch product and price details from Stripe
+				const product = await stripeClient.products.retrieve(sub.product_id);
+				const price = await stripeClient.prices.retrieve(sub.price_id);
+
+				const expiryDate = new Date(sub.current_period_end);
+
+				// Format output data
+				return {
+					productName: product.name,
+					amount: (price.unit_amount / 100).toFixed(2),
+					currency: price.currency.toUpperCase(),
+					interval: price.recurring?.interval || 'one-time',
+					expiryDate: expiryDate.toLocaleDateString('en-GB', {
+						day: '2-digit',
+						month: '2-digit',
+						year: 'numeric'
+					}),
+					status: sub.status
+				};
+			})
+		);
+
+		return subscriptionDetails;
+	} catch (error) {
+		console.error('An error occurred while retrieving subscription details:', error);
+		throw new Error('Could not retrieve subscription details');
+	}
+};
+
+const getUserTransactions = async (userId: string) => {
+	try {
+		// Step 1: Retrieve the customer ID associated with the user
+		const { data, error } = await supabaseAdmin
+			.from('customers')
+			.select('stripe_customer_id')
+			.eq('id', userId)
+			.single();
+
+		if (error) {
+			console.error('Error retrieving user data:', error.message);
+			throw new Error('Failed to fetch user data');
+		}
+
+		const customerId = data?.stripe_customer_id;
+		if (!customerId) {
+			throw new Error('No Stripe customer ID found for this user');
+		}
+
+		// Step 2: Fetch charge transactions from Stripe
+		const charges = await stripeClient.charges.list({ customer: customerId });
+
+		// Step 3: Format transaction data
+		const transactions = charges.data.map((charge) => ({
+			amount: (charge.amount / 100).toFixed(2),
+			currency: charge.currency.toUpperCase(),
+			description: charge.description ?? 'No description provided',
+			status: charge.status,
+			created: new Date(charge.created * 1000).toLocaleDateString('en-GB', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric'
+			}),
+			receipt_url: charge.receipt_url
+		}));
+
+		return transactions;
+	} catch (error) {
+		console.error('An error occurred while retrieving transactions:', error);
+		throw new Error('Could not retrieve transactions');
+	}
+};
+
 export {
 	upsertProductRecord,
 	upsertPriceRecord,
@@ -496,5 +584,7 @@ export {
 	getActiveProductsWithPrices,
 	getProductById,
 	upsertCustomerToSupabase,
-	getStripeCustomerId
+	getStripeCustomerId,
+	getUserSubscriptions,
+	getUserTransactions
 };
