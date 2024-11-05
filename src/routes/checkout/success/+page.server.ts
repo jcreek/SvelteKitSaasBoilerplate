@@ -1,13 +1,14 @@
 import { redirect } from '@sveltejs/kit';
 import Stripe from 'stripe';
 import { getProductById, upsertCustomerToSupabase } from '$lib/utils/supabase/admin';
+import logger from '$lib/utils/logger/logger';
 
 export const load = async ({ fetch, locals: { safeGetSession } }) => {
 	const { session } = await safeGetSession();
 
 	const response = await fetch('/api/checkout/status');
 	if (!response.ok) {
-		console.error('Failed to fetch checkout status');
+		logger.error('Failed to fetch checkout status');
 		return;
 	}
 
@@ -30,7 +31,7 @@ export const load = async ({ fetch, locals: { safeGetSession } }) => {
 		const stripeCustomerId = checkoutSession.customer as string;
 		await upsertCustomerToSupabase(session.user.id, stripeCustomerId);
 	} else {
-		console.error('User ID is undefined');
+		logger.error('User ID is undefined');
 	}
 
 	return {

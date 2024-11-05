@@ -2,6 +2,7 @@ import { type RequestHandler, redirect } from '@sveltejs/kit';
 import { stripe as stripeClient } from '$lib/utils/stripe';
 import { getStripeCustomerId } from '$lib/utils/supabase/admin';
 import type Stripe from 'stripe';
+import logger from '$lib/utils/logger/logger';
 
 // Create a subscription checkout session
 export const POST: RequestHandler = async ({ request, cookies, locals: { safeGetSession } }) => {
@@ -29,7 +30,7 @@ export const POST: RequestHandler = async ({ request, cookies, locals: { safeGet
 	try {
 		stripeCustomerId = await getStripeCustomerId(userEmail!, userId);
 	} catch (error) {
-		console.error('Error fetching Stripe customer ID:', error);
+		logger.error('Error fetching Stripe customer ID:', error);
 	}
 
 	const stripeCheckoutSessionObject = {
