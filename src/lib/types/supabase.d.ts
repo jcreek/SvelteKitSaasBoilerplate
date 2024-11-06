@@ -34,6 +34,32 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          requested_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          requested_at?: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          requested_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_deletion_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_transactions: {
         Row: {
           created_at: string

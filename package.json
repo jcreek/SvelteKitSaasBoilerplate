@@ -48,6 +48,7 @@
 	"type": "module",
 	"dependencies": {
 		"@axiomhq/winston": "^1.2.0",
+		"@getbrevo/brevo": "^2.2.0",
 		"@supabase/ssr": "^0.4.0",
 		"@supabase/supabase-js": "^2.44.2",
 		"stripe": "^15.4.0",

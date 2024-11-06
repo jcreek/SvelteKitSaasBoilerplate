@@ -5,6 +5,7 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { stripe as stripeClient } from '$lib/utils/stripe';
 import logger from '$lib/utils/logger/logger';
+import { sendEmail } from '../brevo/email';
 
 const toDateTime = (secs: number) => {
 	const t = new Date(+0); // Unix epoch start.
@@ -496,6 +497,54 @@ const getProductById = async (productId: string) => {
 	return product as Product;
 };
 
+const requestAccountDeletion = async (userId: string, userEmail: string, baseUrl: string) => {
+	const token = crypto.randomUUID();
+
+	const { error: insertError } = await supabaseAdmin.from('account_deletion_requests').upsert({
+		user_id: userId,
+		token,
+		requested_at: new Date().toISOString()
+	});
+
+	if (insertError) throw new Error(`Account deletion request failed: ${insertError.message}`);
+
+	const deletionLink = `${baseUrl}/api/delete-account?token=${token}`;
+
+	// Send deletion email using Brevo
+	try {
+		await sendEmail(
+			'Confirm Account Deletion',
+			`<p>Click <a href="${deletionLink}">here</a> to confirm your account deletion.</p>`,
+			userEmail
+		);
+		console.log('Deletion email sent successfully.');
+	} catch (emailError) {
+		console.error('Failed to send deletion email:', emailError);
+		throw new Error('Failed to send confirmation email.');
+	}
+};
+
+const deleteAccount = async (token: string) => {
+	// Verify the token
+	const { data: deletionRequest, error } = await supabaseAdmin
+		.from('account_deletion_requests')
+		.select('user_id')
+		.eq('token', token)
+		.single();
+
+	if (error || !deletionRequest) {
+		return new Response('Invalid or expired token', { status: 400 });
+	}
+
+	// N.B. The SQL here will either cascade delete or nullify the foreign key constraints depending on the table, to enable anonymisation
+	const { error: deletionError } = await supabaseAdmin.auth.admin.deleteUser(
+		deletionRequest.user_id
+	);
+	if (deletionError) {
+		throw new Error(`Failed to delete user: ${deletionError.message}`);
+	}
+};
+
 const getUserSubscriptions = async (userId: string) => {
 	try {
 		// Step 1: Retrieve subscription data
@@ -601,5 +650,7 @@ export {
 	upsertCustomerToSupabase,
 	getStripeCustomerId,
 	getUserSubscriptions,
-	getUserTransactions
+	getUserTransactions,
+	requestAccountDeletion,
+	deleteAccount
 };

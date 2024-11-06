@@ -18,6 +18,27 @@
 			loading = false;
 		};
 	};
+
+	const handleSignOut: SubmitFunction = () => {
+		loading = true;
+		return async ({ update }) => {
+			loading = false;
+			update();
+		};
+	};
+
+	const handleAccountDeletion: SubmitFunction = () => {
+		loading = true;
+		if (session.user && session.user.email) {
+			alert('Check your email to confirm account deletion.');
+		} else {
+			alert('Please sign in to delete your account.');
+		}
+		
+		return async () => {
+			loading = false;
+		};
+	};
 </script>
 
 <div
@@ -163,5 +184,12 @@
 				<a href="/contact" class="btn btn-outline w-full">Provide Feedback</a>
 			</section>
 		</div>
-	</div>
+	</form>
+
+	<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
+		<div>
+			<button class="button block" disabled={loading}>Delete My Account</button>
+		</div>
+	</form>
+
 </div>
