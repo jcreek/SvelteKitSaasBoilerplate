@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { basket, type Basket } from '$lib/stores/basket.js';
-	import logger from '$lib/utils/logger/logger.js';
 
 	const dispatch = createEventDispatcher();
 
@@ -23,7 +22,7 @@
 		const { error } = await supabase.auth.signOut();
 
 		if (error) {
-			logger.error('Error signing out:', error.message);
+			console.error('Error signing out:', error.message);
 			alert('Error signing out');
 			return;
 		}
@@ -39,7 +38,7 @@
 				localStorage.removeItem('basket');
 			}
 		} catch (err) {
-			logger.error('Error clearing basket:', err);
+			console.error('Error clearing basket:', err);
 			alert('Error clearing basket');
 		}
 	}
