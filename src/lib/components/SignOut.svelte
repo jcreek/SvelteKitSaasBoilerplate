@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { basket, type Basket } from '$lib/stores/basket.js';
-	import { logger } from '$lib/utils/logger.js';
+	import logger from '$lib/utils/logger/logger.js';
 
 	const dispatch = createEventDispatcher();
 
