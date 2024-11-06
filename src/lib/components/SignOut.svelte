@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { basket, type Basket, type Item } from '$lib/stores/basket.js';
 
 	const dispatch = createEventDispatcher();
@@ -15,6 +15,8 @@
 	const unsubscribe = basket.subscribe((value) => {
 		localBasket = value;
 	});
+
+	onDestroy(unsubscribe);
 
 	async function signOut() {
 		// TODO use the error from the response
