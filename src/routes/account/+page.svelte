@@ -31,7 +31,10 @@
 		loading = true;
 		if (session.user && session.user.email) {
 			alert('Check your email to confirm account deletion.');
+		} else {
+			alert('Please sign in to delete your account.');
 		}
+		
 		return async () => {
 			loading = false;
 		};
