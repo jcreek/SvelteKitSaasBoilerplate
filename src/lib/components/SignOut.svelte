@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy } from 'svelte';
+	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { basket, type Basket } from '$lib/stores/basket.js';
 
 	const dispatch = createEventDispatcher();
@@ -9,7 +10,7 @@
 	}
 
 	// Access the supabase client from the layout data
-	export let supabase: any;
+	export let supabase: SupabaseClient;
 
 	let localBasket: Basket;
 	const unsubscribe = basket.subscribe((value) => {
