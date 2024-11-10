@@ -10,7 +10,7 @@
 
 	const handleSubmit: SubmitFunction = ({}) => {
 		return async ({ result, update }) => {
-			if (result.data.success) {
+			if (result.data && result.data.success) {
 				submitted = true;
 			} else {
 				error = result.error?.message || 'Form submission failed';
