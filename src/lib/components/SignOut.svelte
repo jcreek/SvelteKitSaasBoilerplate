@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
+	import type { SupabaseClient } from '@supabase/supabase-js';
+	import { basket, type Basket } from '$lib/stores/basket.js';
+
 	const dispatch = createEventDispatcher();
 
 	function emitSignedOutEvent() {
@@ -7,13 +10,38 @@
 	}
 
 	// Access the supabase client from the layout data
-	export let supabase: any;
+	export let supabase: SupabaseClient;
+
+	let localBasket: Basket;
+	const unsubscribe = basket.subscribe((value) => {
+		localBasket = value;
+	});
+
+	onDestroy(unsubscribe);
 
 	async function signOut() {
-		// TODO use the error from the response
-		const { error } = await supabase.auth.signOut().then(() => {
+		const { error } = await supabase.auth.signOut();
+
+		if (error) {
+			console.error('Error signing out:', error.message);
+			alert('Error signing out');
+			return;
+		}
+
+		try {
 			emitSignedOutEvent();
-		});
+
+			// Clear the basket
+			localBasket = { items: [], subtotal: 0 };
+			basket.set(localBasket);
+			unsubscribe();
+			if (typeof localStorage !== 'undefined') {
+				localStorage.removeItem('basket');
+			}
+		} catch (err) {
+			console.error('Error clearing basket:', err);
+			alert('Error clearing basket');
+		}
 	}
 </script>
 

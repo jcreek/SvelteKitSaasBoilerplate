@@ -78,12 +78,5 @@ export const actions: Actions = {
 		return {
 			name
 		};
-	},
-	signout: async ({ locals: { supabase, safeGetSession } }) => {
-		const { session } = await safeGetSession();
-		if (session) {
-			await supabase.auth.signOut();
-			redirect(303, '/');
-		}
 	}
 };
