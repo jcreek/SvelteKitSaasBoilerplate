@@ -34,7 +34,7 @@
 		} else {
 			alert('Please sign in to delete your account.');
 		}
-		
+
 		return async () => {
 			loading = false;
 		};
@@ -184,12 +184,11 @@
 				<a href="/contact" class="btn btn-outline w-full">Provide Feedback</a>
 			</section>
 		</div>
-	</form>
 
-	<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
-		<div>
-			<button class="button block" disabled={loading}>Delete My Account</button>
-		</div>
-	</form>
-
+		<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
+			<div>
+				<button class="button block" disabled={loading}>Delete My Account</button>
+			</div>
+		</form>
+	</div>
 </div>
