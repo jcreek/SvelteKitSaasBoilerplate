@@ -8,13 +8,17 @@
 	let submitted = false;
 	let error = '';
 
-	const handleSubmit: SubmitFunction = ({}) => {
+	const handleSubmit: SubmitFunction = () => {
+		let loading = false;
 		return async ({ result, update }) => {
+			loading = true;
 			if (result.data && result.data.success) {
 				submitted = true;
 			} else {
 				error = result.error?.message || 'Form submission failed';
 			}
+			loading = false;
+			await update();
 		};
 	};
 </script>
