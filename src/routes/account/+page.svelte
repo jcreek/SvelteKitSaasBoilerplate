@@ -1,12 +1,13 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data;
 	export let form;
 
-	let { session, user, subscriptions, transactions } = data;
-	$: ({ session, supabase, user } = data);
+	let { session, user, subscriptions, transactions, pageSize } = data;
+	$: ({ session, supabase, user, transactions } = data);
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
@@ -39,6 +40,40 @@
 			loading = false;
 		};
 	};
+
+	// Track pagination IDs for Stripe-based pagination
+	let startingAfter: string | undefined = undefined;
+	let endingBefore: string | undefined = undefined;
+
+	// Function to trigger pagination
+	async function goToPage(direction: 'next' | 'previous') {
+		loading = true;
+
+		// Set up formData with appropriate IDs for pagination
+		const formData = new FormData();
+		if (direction === 'next' && transactions.length) {
+			startingAfter = transactions[transactions.length - 1].id;
+			formData.append('startingAfter', startingAfter);
+			endingBefore = undefined; // Reset `endingBefore` for forward navigation
+		} else if (direction === 'previous' && transactions.length) {
+			endingBefore = transactions[0].id;
+			formData.append('endingBefore', endingBefore);
+			startingAfter = undefined; // Reset `startingAfter` for backward navigation
+		}
+
+		// Fetch paginated transactions
+		const response = await fetch('/account?/paginate', {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await response.json();
+
+		// TODO - work out why the data comes back in such a weird format here
+		transactions = JSON.parse(JSON.parse(result.data)[1]);
+
+		loading = false;
+	}
 </script>
 
 <div
@@ -126,8 +161,9 @@
 			<!-- Billing History -->
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Billing History</h2>
-				<ul class="space-y-3">
-					{#if transactions}
+
+				{#if transactions && transactions.length > 0}
+					<ul class="space-y-3">
 						{#each transactions as transaction}
 							<li class="flex justify-between p-4 border border-gray-200 rounded-md">
 								<div>
@@ -146,8 +182,29 @@
 								{/if}
 							</li>
 						{/each}
-					{/if}
-				</ul>
+					</ul>
+				{:else}
+					<p class="text-gray-600">No transactions found.</p>
+				{/if}
+
+				<!-- Pagination Controls -->
+				<div class="flex justify-center items-center space-x-2 mt-4">
+					<button
+						class="btn btn-outline"
+						disabled={!transactions.length || loading}
+						on:click={() => goToPage('previous')}
+					>
+						Previous
+					</button>
+
+					<button
+						class="btn btn-outline"
+						disabled={!transactions.length || loading}
+						on:click={() => goToPage('next')}
+					>
+						Next
+					</button>
+				</div>
 			</section>
 		</div>
 

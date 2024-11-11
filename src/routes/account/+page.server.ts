@@ -4,6 +4,8 @@ import logger from '$lib/utils/logger/logger';
 import { getUserSubscriptions, getUserTransactions } from '$lib/utils/supabase/admin';
 import { requestAccountDeletion } from '$lib/utils/supabase/admin';
 
+const transactionsPerPage = 5;
+
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
 	const { session } = await safeGetSession();
 
@@ -19,9 +21,9 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
 	const subscriptions = await getUserSubscriptions(session.user.id);
 
-	const transactions = await getUserTransactions(session.user.id);
+	const transactions = await getUserTransactions(session.user.id, transactionsPerPage);
 
-	return { session, user, subscriptions, transactions };
+	return { session, user, subscriptions, transactions, pageSize: transactionsPerPage };
 };
 
 export const actions: Actions = {
@@ -78,5 +80,32 @@ export const actions: Actions = {
 		return {
 			name
 		};
+	},
+	paginate: async ({ request, locals: { safeGetSession } }) => {
+		const formData = await request.formData();
+		const pageSize = transactionsPerPage;
+		const startingAfter = formData.get('startingAfter')?.toString() || undefined;
+		const endingBefore = formData.get('endingBefore')?.toString() || undefined;
+
+		const { session } = await safeGetSession();
+		if (!session) return fail(401, { error: 'Not authenticated' });
+
+		try {
+			const transactions = await getUserTransactions(
+				session.user.id,
+				pageSize,
+				startingAfter,
+				endingBefore
+			);
+
+			const serializableTransactions = transactions.map((transaction) => ({ ...transaction }));
+
+			const stringifiedTransactions: string = JSON.stringify(serializableTransactions);
+
+			return { stringifiedTransactions };
+		} catch (error) {
+			logger.error('Failed to fetch transactions', { userId: session.user.id, error });
+			return fail(500, { error: 'Failed to load transactions' });
+		}
 	}
 };
