@@ -625,6 +625,8 @@ const getUserTransactions = async (
 
 		const charges = await stripeClient.charges.list(params);
 
+		const hasNextPage = charges.has_more;
+
 		// Step 3: Format transaction data
 		const transactions = charges.data.map((charge) => ({
 			id: charge.id,
@@ -640,7 +642,7 @@ const getUserTransactions = async (
 			receipt_url: charge.receipt_url
 		}));
 
-		return transactions;
+		return { transactions, hasNextPage };
 	} catch (error) {
 		console.error('An error occurred while retrieving transactions:', error);
 		throw new Error('Could not retrieve transactions');

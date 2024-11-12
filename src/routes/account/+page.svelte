@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
@@ -41,39 +40,21 @@
 		};
 	};
 
-	// Track pagination IDs for Stripe-based pagination
 	let startingAfter: string | undefined = undefined;
 	let endingBefore: string | undefined = undefined;
+	let hasNextPage = true;
+	let hasPreviousPage = false;
 
-	// Function to trigger pagination
-	async function goToPage(direction: 'next' | 'previous') {
+	const handlePaginationSubmit: SubmitFunction = () => {
 		loading = true;
 
-		// Set up formData with appropriate IDs for pagination
-		const formData = new FormData();
-		if (direction === 'next' && transactions.length) {
-			startingAfter = transactions[transactions.length - 1].id;
-			formData.append('startingAfter', startingAfter);
-			endingBefore = undefined; // Reset `endingBefore` for forward navigation
-		} else if (direction === 'previous' && transactions.length) {
-			endingBefore = transactions[0].id;
-			formData.append('endingBefore', endingBefore);
-			startingAfter = undefined; // Reset `startingAfter` for backward navigation
-		}
-
-		// Fetch paginated transactions
-		const response = await fetch('/account?/paginate', {
-			method: 'POST',
-			body: formData
-		});
-
-		const result = await response.json();
-
-		// TODO - work out why the data comes back in such a weird format here
-		transactions = JSON.parse(JSON.parse(result.data)[1]);
-
-		loading = false;
-	}
+		return async ({ result }) => {
+			transactions = JSON.parse(result.data.transactions);
+			hasNextPage = result.data.hasNextPage;
+			hasPreviousPage = !result.data.isFirstPage;
+			loading = false;
+		};
+	};
 </script>
 
 <div
@@ -187,24 +168,45 @@
 					<p class="text-gray-600">No transactions found.</p>
 				{/if}
 
-				<!-- Pagination Controls -->
-				<div class="flex justify-center items-center space-x-2 mt-4">
-					<button
-						class="btn btn-outline"
-						disabled={!transactions.length || loading}
-						on:click={() => goToPage('previous')}
-					>
-						Previous
-					</button>
+				<!-- Pagination Form -->
+				<form method="post" action="?/paginate" use:enhance={handlePaginationSubmit}>
+					<div class="flex justify-center items-center space-x-2 mt-4">
+						<input type="hidden" name="startingAfter" value={startingAfter} />
+						<input type="hidden" name="endingBefore" value={endingBefore} />
 
-					<button
-						class="btn btn-outline"
-						disabled={!transactions.length || loading}
-						on:click={() => goToPage('next')}
-					>
-						Next
-					</button>
-				</div>
+						<button
+							type="submit"
+							name="direction"
+							value="previous"
+							class="btn btn-outline"
+							disabled={!hasPreviousPage || loading}
+							on:click={() => {
+								if (transactions.length) {
+									endingBefore = transactions[0].id;
+									startingAfter = undefined;
+								}
+							}}
+						>
+							Previous
+						</button>
+
+						<button
+							type="submit"
+							name="direction"
+							value="next"
+							class="btn btn-outline"
+							disabled={!hasNextPage || loading}
+							on:click={() => {
+								if (transactions.length) {
+									startingAfter = transactions[transactions.length - 1].id;
+									endingBefore = undefined;
+								}
+							}}
+						>
+							Next
+						</button>
+					</div>
+				</form>
 			</section>
 		</div>
 

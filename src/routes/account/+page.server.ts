@@ -5,6 +5,8 @@ import { getUserSubscriptions, getUserTransactions } from '$lib/utils/supabase/a
 import { requestAccountDeletion } from '$lib/utils/supabase/admin';
 
 const transactionsPerPage = 5;
+let firstTransactionId: string;
+let hasMoreThanOnePage = false;
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
 	const { session } = await safeGetSession();
@@ -21,9 +23,19 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
 	const subscriptions = await getUserSubscriptions(session.user.id);
 
-	const transactions = await getUserTransactions(session.user.id, transactionsPerPage);
+	const transactionsData = await getUserTransactions(session.user.id, transactionsPerPage);
 
-	return { session, user, subscriptions, transactions, pageSize: transactionsPerPage };
+	const transactions = transactionsData.transactions;
+	firstTransactionId = transactions[0]?.id;
+	hasMoreThanOnePage = transactionsData.hasNextPage;
+
+	return {
+		session,
+		user,
+		subscriptions,
+		transactions,
+		pageSize: transactionsPerPage
+	};
 };
 
 export const actions: Actions = {
@@ -84,25 +96,34 @@ export const actions: Actions = {
 	paginate: async ({ request, locals: { safeGetSession } }) => {
 		const formData = await request.formData();
 		const pageSize = transactionsPerPage;
-		const startingAfter = formData.get('startingAfter')?.toString() || undefined;
-		const endingBefore = formData.get('endingBefore')?.toString() || undefined;
+
+		let startingAfter = formData.get('startingAfter')?.toString() || undefined;
+		if (startingAfter === 'undefined') {
+			startingAfter = undefined;
+		}
+		let endingBefore = formData.get('endingBefore')?.toString() || undefined;
+		if (endingBefore === 'undefined') {
+			endingBefore = undefined;
+		}
 
 		const { session } = await safeGetSession();
 		if (!session) return fail(401, { error: 'Not authenticated' });
 
 		try {
-			const transactions = await getUserTransactions(
+			const { transactions, hasNextPage } = await getUserTransactions(
 				session.user.id,
 				pageSize,
 				startingAfter,
 				endingBefore
 			);
 
-			const serializableTransactions = transactions.map((transaction) => ({ ...transaction }));
+			const isFirstPage = transactions[0].id === firstTransactionId;
 
-			const stringifiedTransactions: string = JSON.stringify(serializableTransactions);
-
-			return { stringifiedTransactions };
+			return {
+				transactions: JSON.stringify(transactions),
+				hasNextPage: hasNextPage || (isFirstPage && hasMoreThanOnePage),
+				isFirstPage
+			};
 		} catch (error) {
 			logger.error('Failed to fetch transactions', { userId: session.user.id, error });
 			return fail(500, { error: 'Failed to load transactions' });
