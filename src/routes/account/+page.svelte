@@ -5,8 +5,8 @@
 	export let data;
 	export let form;
 
-	let { session, user, subscriptions, transactions, pageSize } = data;
-	$: ({ session, supabase, user, transactions } = data);
+	let { session, user, subscriptions, transactions } = data;
+	$: ({ session, user, transactions } = data);
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
