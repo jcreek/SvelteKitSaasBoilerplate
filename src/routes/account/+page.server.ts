@@ -5,8 +5,6 @@ import { getUserSubscriptions, getUserTransactions } from '$lib/utils/supabase/a
 import { requestAccountDeletion } from '$lib/utils/supabase/admin';
 
 const transactionsPerPage = 5;
-let firstTransactionId: string;
-let hasMoreThanOnePage = false;
 
 export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
 	const { session } = await safeGetSession();
@@ -26,14 +24,16 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 	const transactionsData = await getUserTransactions(session.user.id, transactionsPerPage);
 
 	const transactions = transactionsData.transactions;
-	firstTransactionId = transactions[0]?.id;
-	hasMoreThanOnePage = transactionsData.hasNextPage;
+	const firstTransactionId = transactions.length > 0 ? transactions[0].id : undefined;
+	const hasMoreThanOnePage = transactionsData.hasNextPage;
 
 	return {
 		session,
 		user,
 		subscriptions,
 		transactions,
+		firstTransactionId,
+		hasMoreThanOnePage,
 		pageSize: transactionsPerPage
 	};
 };
@@ -105,6 +105,8 @@ export const actions: Actions = {
 		if (endingBefore === 'undefined') {
 			endingBefore = undefined;
 		}
+		const firstTransactionId = formData.get('firstTransactionId')?.toString();
+		const hasMoreThanOnePage = formData.get('hasMoreThanOnePage') === 'true';
 
 		const { session } = await safeGetSession();
 		if (!session) return fail(401, { error: 'Not authenticated' });
@@ -117,7 +119,7 @@ export const actions: Actions = {
 				endingBefore
 			);
 
-			const isFirstPage = transactions[0].id === firstTransactionId;
+			const isFirstPage = transactions.length > 0 && transactions[0].id === firstTransactionId;
 
 			return {
 				transactions: JSON.stringify(transactions),

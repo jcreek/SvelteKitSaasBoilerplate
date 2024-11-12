@@ -5,8 +5,8 @@
 	export let data;
 	export let form;
 
-	let { session, user, subscriptions, transactions } = data;
-	$: ({ session, user, transactions } = data);
+	let { session, user, subscriptions, transactions, firstTransactionId, hasMoreThanOnePage } = data;
+	$: ({ session, user, transactions, firstTransactionId, hasMoreThanOnePage } = data);
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
@@ -42,7 +42,7 @@
 
 	let startingAfter: string | undefined = undefined;
 	let endingBefore: string | undefined = undefined;
-	let hasNextPage = true;
+	let hasNextPage = hasMoreThanOnePage;
 	let hasPreviousPage = false;
 
 	const handlePaginationSubmit: SubmitFunction = () => {
@@ -177,6 +177,8 @@
 					>
 						<input type="hidden" name="startingAfter" value={startingAfter} />
 						<input type="hidden" name="endingBefore" value={endingBefore} />
+						<input type="hidden" name="firstTransactionId" value={firstTransactionId} />
+						<input type="hidden" name="hasMoreThanOnePage" value={hasMoreThanOnePage} />
 
 						<button
 							type="submit"
