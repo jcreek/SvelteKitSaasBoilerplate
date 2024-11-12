@@ -170,7 +170,11 @@
 
 				<!-- Pagination Form -->
 				<form method="post" action="?/paginate" use:enhance={handlePaginationSubmit}>
-					<div class="flex justify-center items-center space-x-2 mt-4">
+					<div
+						class="flex justify-center items-center space-x-2 mt-4"
+						role="navigation"
+						aria-label="Transactions pagination"
+					>
 						<input type="hidden" name="startingAfter" value={startingAfter} />
 						<input type="hidden" name="endingBefore" value={endingBefore} />
 
@@ -180,6 +184,7 @@
 							value="previous"
 							class="btn btn-outline"
 							disabled={!hasPreviousPage || loading}
+							aria-label="View previous page of transactions"
 							on:click={() => {
 								if (transactions.length) {
 									endingBefore = transactions[0].id;
@@ -196,6 +201,7 @@
 							value="next"
 							class="btn btn-outline"
 							disabled={!hasNextPage || loading}
+							aria-label="View next page of transactions"
 							on:click={() => {
 								if (transactions.length) {
 									startingAfter = transactions[transactions.length - 1].id;
