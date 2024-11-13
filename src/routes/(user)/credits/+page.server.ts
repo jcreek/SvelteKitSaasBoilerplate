@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getUserCredits, getUserCreditTransactions } from '$lib/utils/supabase/admin';
+import logger from '$lib/utils/logger/logger';
 
 export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
 	const { session } = await safeGetSession();
@@ -15,8 +16,14 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
 	}
 
 	try {
-		const creditsRemaining = await getUserCredits(userId);
-		const transactions = await getUserCreditTransactions(userId);
+		const creditsRemaining = await getUserCredits(userId).catch((error) => {
+			logger.error('Failed to fetch user credits:', error);
+			throw new Error('Unable to retrieve credit balance');
+		});
+		const transactions = await getUserCreditTransactions(userId).catch((error) => {
+			logger.error('Failed to fetch credit transactions:', error);
+			throw new Error('Unable to retrieve transaction history');
+		});
 
 		const monthlyAggregates = transactions.reduce((acc, transaction) => {
 			const date = new Date(transaction.created_at);
