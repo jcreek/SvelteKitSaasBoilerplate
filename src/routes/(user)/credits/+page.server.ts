@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 import { getUserCredits, getUserCreditTransactions } from '$lib/utils/supabase/admin';
 
-export async function load({ locals: { safeGetSession } }) {
+export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
 	const { session } = await safeGetSession();
 
 	if (!session) {
@@ -42,4 +43,4 @@ export async function load({ locals: { safeGetSession } }) {
 			error: error.message
 		};
 	}
-}
+};
