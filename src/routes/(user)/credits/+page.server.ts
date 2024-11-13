@@ -19,7 +19,7 @@ export async function load({ locals: { safeGetSession } }) {
 
 		const monthlyAggregates = transactions.reduce((acc, transaction) => {
 			const date = new Date(transaction.created_at);
-			const month = `${date.getFullYear()}-${date.getMonth() + 1}`;
+			const month = date.toISOString().substring(0, 7); // Returns YYYY-MM format
 
 			if (!acc[month]) acc[month] = { credits_added: 0, credits_deducted: 0 };
 

@@ -19,7 +19,7 @@
 
 	const groupedTransactions = transactions.reduce((acc, transaction) => {
 		const date = new Date(transaction.created_at);
-		const month = `${date.getFullYear()}-${date.getMonth() + 1}`;
+		const month = date.toISOString().substring(0, 7); // Returns YYYY-MM format
 		if (!acc[month]) acc[month] = [];
 		acc[month].push(transaction);
 		return acc;
