@@ -17,9 +17,25 @@ export async function load({ locals: { safeGetSession } }) {
 		const creditsRemaining = await getUserCredits(userId);
 		const transactions = await getUserCreditTransactions(userId);
 
+		const monthlyAggregates = transactions.reduce((acc, transaction) => {
+			const date = new Date(transaction.created_at);
+			const month = `${date.getFullYear()}-${date.getMonth() + 1}`;
+
+			if (!acc[month]) acc[month] = { credits_added: 0, credits_deducted: 0 };
+
+			if (transaction.credits_change > 0) {
+				acc[month].credits_added += transaction.credits_change;
+			} else {
+				acc[month].credits_deducted += transaction.credits_change;
+			}
+
+			return acc;
+		}, {});
+
 		return {
 			creditsRemaining,
-			transactions
+			transactions,
+			monthlyAggregates
 		};
 	} catch (error) {
 		return {
