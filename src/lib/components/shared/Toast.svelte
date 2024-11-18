@@ -6,7 +6,7 @@
 	import type { Toast } from '$lib/types/Shared/Toast';
 
 	let localToast: Toast;
-	const unsubscribeToToastStore = toast.subscribe((value) => {
+	const unsubscribeToToastStore = toast.subscribe((value: Toast) => {
 		localToast = value;
 	});
 
