@@ -28,7 +28,7 @@
 		<div class="lg:hidden mr-4">
 			<Dropdown>
 				<div slot="dropdown">
-					<button class="block text-white focus:outline-none">
+					<button class="block text-white focus:outline-none" aria-label="Open navigation menu">
 						<svg
 							class="w-6 h-6"
 							fill="none"
