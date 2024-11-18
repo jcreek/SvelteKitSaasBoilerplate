@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { signOut } from '$lib/utils/supabase/auth';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import type { SupabaseClient } from '@supabase/supabase-js';
+	import { basket, type Basket } from '$lib/stores/basket.js';
+
 	const dispatch = createEventDispatcher();
 
 	function emitSignedOutEvent() {
@@ -9,13 +10,39 @@
 	}
 
 	// Access the supabase client from the layout data
-	export let supabase: SupabaseClient | null;
+	export let supabase: SupabaseClient;
 
-	async function signOutClick() {
-		if (!supabase) return;
-		await signOut(supabase, emitSignedOutEvent);
+	let localBasket: Basket;
+	const unsubscribe = basket.subscribe((value) => {
+		localBasket = value;
+	});
+
+	onDestroy(unsubscribe);
+
+	async function signOut() {
+		const { error } = await supabase.auth.signOut();
+
+		if (error) {
+			console.error('Error signing out:', error.message);
+			alert('Error signing out');
+			return;
+		}
+
+		try {
+			emitSignedOutEvent();
+
+			// Clear the basket
+			localBasket = { items: [], subtotal: 0 };
+			basket.set(localBasket);
+			unsubscribe();
+			if (typeof localStorage !== 'undefined') {
+				localStorage.removeItem('basket');
+			}
+		} catch (err) {
+			console.error('Error clearing basket:', err);
+			alert('Error clearing basket');
+		}
 	}
 </script>
 
-<button on:click={signOutClick} aria-label="Sign out of your account" type="button">Sign Out</button
->
+<button on:click={signOut} aria-label="Sign out of your account" type="button">Sign Out</button>
