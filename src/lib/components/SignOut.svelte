@@ -17,4 +17,5 @@
 	}
 </script>
 
-<button on:click={signOutClick}>Sign Out</button>
+<button on:click={signOutClick} aria-label="Sign out of your account" type="button">Sign Out</button
+>
