@@ -6,9 +6,10 @@
 	import Dropdown from '../Dropdown.svelte';
 	import { basket, type Basket } from '$lib/stores/basket.js';
 	import { onDestroy } from 'svelte';
+	import type { Database } from '$lib/types/supabase';
 
 	export let session: Session | null;
-	export let supabase: SupabaseClient<any, 'public', any>;
+	export let supabase: SupabaseClient<Database>;
 
 	let localBasket: Basket;
 	const unsubscribeToBasket = basket.subscribe((value) => {
@@ -21,7 +22,7 @@
 </script>
 
 <nav class="bg-primary text-primary-content p-4">
-    <!-- Nav Container -->
+	<!-- Nav Container -->
 	<div class="container mx-auto flex justify-between items-center">
 		<!-- Hamburger Menu Button (Mobile) -->
 		<div class="lg:hidden mr-4">
@@ -48,7 +49,7 @@
 				<NavLinks isMobile {session} {supabase} />
 			</Dropdown>
 		</div>
-        <!-- Logo -->
+		<!-- Logo -->
 		<a href="/" class="text-white font-bold text-xl">SvelteKit SaaS Boilerplate</a>
 		<div class="hidden lg:block">
 			<NavLinks {session} />
