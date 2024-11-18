@@ -15,9 +15,10 @@
 	};
 
 	onMount(() => {
-		const handleClickAnywhere = (event: MouseEvent) => {
-			if (!isOpen) return;
-			if (!dropdown.contains(event.target as Node) || event.target instanceof HTMLAnchorElement) {
+		const handleClickAnywhere = ({ target }: MouseEvent) => {
+			if (!isOpen || !target) return;
+			const clickTarget = target as HTMLElement;
+			if (!dropdown.contains(clickTarget) || clickTarget.closest('a')) {
 				isOpen = false;
 			}
 		};
