@@ -3,6 +3,7 @@
 	import type { Session } from '@supabase/supabase-js';
 	import NavLinkParent from './NavLinkParent.svelte';
 	import type SupabaseClient from '@supabase/supabase-js/dist/module/SupabaseClient';
+	import NavLink from './NavLink.svelte';
 
 	export let session: Session | null;
 	export let supabase: SupabaseClient | null = null;
@@ -68,7 +69,7 @@
 			{#if link.isParent}
 				<NavLinkParent linkItem={link} {isMobile} {supabase} />
 			{:else}
-				<a href={link.href}>{link.text}</a>
+				<NavLink linkItem={link} />
 			{/if}
 		</li>
 	{/each}
