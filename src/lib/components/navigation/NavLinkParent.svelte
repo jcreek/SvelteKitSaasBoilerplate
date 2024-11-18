@@ -30,6 +30,7 @@
 	</button>
 	{#if isOpen}
 		<ul
+			role="menu"
 			class="menu-dropdown menu-dropdown-show"
 			transition:slide={{ duration: 200, easing: cubicInOut }}
 		>

@@ -63,7 +63,7 @@
 	];
 </script>
 
-<ul class:flex={!isMobile} class:space-x-4={!isMobile}>
+<ul role="menu" class:flex={!isMobile} class:space-x-4={!isMobile}>
 	{#each links as link (link.text.replace(' ', '-').toLowerCase())}
 		<li class:md:hidden={link.isUserAccount}>
 			{#if link.isParent}

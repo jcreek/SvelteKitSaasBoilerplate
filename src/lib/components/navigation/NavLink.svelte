@@ -9,7 +9,11 @@
 </script>
 
 {#if !linkItem.isSignout}
-	<a role="menuitem" href={linkItem.href} aria-current={linkItem.href === $page.url.pathname ? 'page' : undefined}>{linkItem.text}</a>
+	<a
+		role="menuitem"
+		href={linkItem.href}
+		aria-current={linkItem.href === $page.url.pathname ? 'page' : undefined}>{linkItem.text}</a
+	>
 {:else if supabase && linkItem.isSignout}
 	<SignOut {supabase} />
 {/if}
