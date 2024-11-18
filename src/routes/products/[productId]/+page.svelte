@@ -2,7 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { redirect } from '@sveltejs/kit';
 	import { basket, type Basket } from '$lib/stores/basket.js';
-	import { general } from '$lib/stores/generalStore.js';
+	import { scheduleToast } from '$lib/stores/toastStore.js';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -40,15 +40,7 @@
 			}
 		});
 
-		general.update((value) => {
-			return { ...value, hideToast: false };
-		});
-
-		setTimeout(() => {
-			general.update((value) => {
-				return { ...value, hideToast: true };
-			});
-		}, 5000);
+		scheduleToast('Added to basket', 'success', 5000);
 	}
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { general } from '$lib/stores/generalStore.js';
+	import { scheduleToast } from '$lib/stores/toastStore.js';
 
 	const dispatch = createEventDispatcher();
 
@@ -28,21 +28,7 @@
 
 	async function forgotPassword() {
 		if (email === '') {
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Please enter your email address',
-					toastType: 'error'
-				};
-			});
-
-			setTimeout(() => {
-				general.update((value) => {
-					return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
-				});
-			}, 5000);
-
+			scheduleToast('Please enter your email address', 'error', 5000);
 			return;
 		}
 
@@ -52,31 +38,11 @@
 
 		if (error) {
 			console.error('Error sending password reset email:', error.message);
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Error sending password reset email. Please try again.',
-					toastType: 'error'
-				};
-			});
+			scheduleToast('Error sending password reset email. Please try again.', 'error', 5000);
 		} else {
 			console.log('Password reset email sent:', data);
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Password reset email sent. Please check your inbox.',
-					toastType: 'success'
-				};
-			});
+			scheduleToast('Password reset email sent. Please check your inbox.', 'error', 5000);
 		}
-
-		setTimeout(() => {
-			general.update((value) => {
-				return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
-			});
-		}, 5000);
 	}
 </script>
 

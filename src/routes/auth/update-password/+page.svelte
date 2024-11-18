@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { general } from '$lib/stores/generalStore.js';
+	import { scheduleToast } from '$lib/stores/toastStore.js';
 
 	// Access the supabase client from the layout data
 	export let supabase: any;
@@ -8,21 +8,7 @@
 
 	async function resetPassword() {
 		if (newPassword === '') {
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Please enter a new password',
-					toastType: 'error'
-				};
-			});
-
-			setTimeout(() => {
-				general.update((value) => {
-					return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
-				});
-			}, 5000);
-
+			scheduleToast('Please enter a new password', 'error', 5000);
 			return;
 		}
 
@@ -32,37 +18,15 @@
 
 		if (error) {
 			console.error('Error updating password:', error.message);
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Error updating password. Please try again.',
-					toastType: 'error'
-				};
-			});
-
-			setTimeout(() => {
-				general.update((value) => {
-					return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
-				});
-			}, 5000);
+			scheduleToast('Error updating password. Please try again.', 'error', 5000);
 
 			return;
 		} else {
-			general.update((value) => {
-				return {
-					...value,
-					hideToast: false,
-					toastMessage: 'Password updated successfully. Please sign in with your new password.',
-					toastType: 'success'
-				};
-			});
-
-			setTimeout(() => {
-				general.update((value) => {
-					return { ...value, hideToast: true, toastMessage: '', toastType: 'success' };
-				});
-			}, 5000);
+			scheduleToast(
+				'Password updated successfully. Please sign in with your new password.',
+				'success',
+				5000
+			);
 		}
 	}
 </script>
