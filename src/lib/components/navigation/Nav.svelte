@@ -83,7 +83,10 @@
 			<!-- User Account Dropdown -->
 			<Dropdown posRight>
 				<div slot="dropdown">
-					<div class="btn btn-ghost btn-circle avatar placeholder hidden md:flex">
+					<div
+						class="btn btn-ghost btn-circle avatar placeholder hidden md:flex"
+						aria-label="User account menu"
+					>
 						<div class="w-10 rounded-full">
 							{#if session?.user}
 								<div class="user-circle text-primary-content border-primary-content">
