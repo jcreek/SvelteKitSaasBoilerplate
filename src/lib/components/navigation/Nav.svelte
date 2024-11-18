@@ -57,7 +57,7 @@
 		<!-- Right Side: Basket & User Account -->
 		<div class="flex items-center space-x-4">
 			<!-- Basket/Checkout Icon -->
-			<a href="/checkout" class="btn btn-ghost btn-circle">
+			<a href="/checkout" class="btn btn-ghost btn-circle" aria-label="View basket">
 				<div class="indicator">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
