@@ -19,6 +19,7 @@
 	<div
 		id={localToast.toastType == 'success' ? 'success-toast' : 'error-toast'}
 		role="alert"
+		aria-live="polite"
 		class="alert {localToast.toastType == 'success'
 			? 'alert-success'
 			: 'alert-error'} fixed top-20 right-3 max-w-80 z-50 text-white"
