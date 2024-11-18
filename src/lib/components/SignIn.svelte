@@ -41,7 +41,7 @@
 			scheduleToast('Error sending password reset email. Please try again.', 'error', 5000);
 		} else {
 			console.log('Password reset email sent:', data);
-			scheduleToast('Password reset email sent. Please check your inbox.', 'error', 5000);
+			scheduleToast('Password reset email sent. Please check your inbox.', 'success', 5000);
 		}
 	}
 </script>
