@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Chart, { type ChartData } from 'chart.js/auto';
 	import { DataTable } from 'simple-datatables';
+	import 'simple-datatables/dist/style.css';
 
 	export let data;
 	const { creditsRemaining, transactions, monthlyAggregates } = data;
