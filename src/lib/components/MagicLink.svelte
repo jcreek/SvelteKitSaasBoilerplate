@@ -1,20 +1,18 @@
 <script lang="ts">
+	import { scheduleToast } from '$lib/stores/toastStore.js';
 	export let supabase: any;
+	const SUCCESS_MESSAGE = 'Check your email for the magic link.';
 
-	let error = '',
-		message = '',
-		loading = false,
+	let loading = false,
 		email = '';
 
 	async function submit() {
-		error = '';
-		message = '';
 		loading = true;
 
 		const { error: err } = await supabase.auth.signInWithOtp({ email });
 
-		if (err) error = err.message;
-		else message = 'Check your email for the magic link.';
+		if (err) scheduleToast(err.message, 'error', 5000);
+		else scheduleToast(SUCCESS_MESSAGE, 'success', 5000);
 
 		loading = false;
 	}
@@ -37,18 +35,6 @@
 				<button class="btn btn-active btn-primary w-full" on:click disabled={loading}
 					>Send magic link</button
 				>
-
-				{#if message}
-					<div class="text-success">
-						{message}
-					</div>
-				{/if}
-
-				{#if error}
-					<div class="text-error">
-						{error}
-					</div>
-				{/if}
 			</form>
 		</div>
 	</div>
