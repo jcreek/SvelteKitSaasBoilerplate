@@ -627,8 +627,8 @@ const getUserTransactions = async (
 			.single();
 
 		if (error) {
-			console.error('Error retrieving user data:', error.message);
-			throw new Error('Failed to fetch user data');
+			logger.error('Error retrieving user data:', error.message);
+			return;
 		}
 
 		const customerId = data?.stripe_customer_id;
