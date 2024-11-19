@@ -125,6 +125,7 @@
 
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Credit Usage</h2>
+				<p class="text-gray-600">Monitor your credit balance and view transaction history.</p>
 				<a href="/credits" class="btn btn-secondary w-full">View details</a>
 			</section>
 
