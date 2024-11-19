@@ -23,9 +23,9 @@ export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession 
 
 	const transactionsData = await getUserTransactions(session.user.id, transactionsPerPage);
 
-	const transactions = transactionsData.transactions;
+	const transactions = transactionsData?.transactions ?? [];
 	const firstTransactionId = transactions.length > 0 ? transactions[0].id : undefined;
-	const hasMoreThanOnePage = transactionsData.hasNextPage;
+	const hasMoreThanOnePage = transactionsData?.hasNextPage ?? false;
 
 	return {
 		session,
