@@ -451,6 +451,28 @@ const getUserCredits = async (userId: string) => {
 	return creditData.credits_remaining;
 };
 
+/**
+ * Fetches the credit transaction history for a specific user.
+ *
+ * @param userId - The ID of the user whose transactions are to be fetched.
+ * @returns Array of transaction records containing credits_change, description, and created_at.
+ */
+export const getUserCreditTransactions = async (userId: string) => {
+	if (!userId) throw new Error('User ID is required');
+
+	const { data, error } = await supabaseAdmin
+		.from('credit_transactions')
+		.select('credits_change, description, created_at')
+		.eq('user_id', userId)
+		.order('created_at', { ascending: false }); // Orders transactions with the latest ones first
+
+	if (error) {
+		throw new Error(`Error fetching transactions: ${error.message}`);
+	}
+
+	return data || [];
+};
+
 type ProductWithPrices = Product & {
 	prices: Price[];
 	actualPrice?: number;

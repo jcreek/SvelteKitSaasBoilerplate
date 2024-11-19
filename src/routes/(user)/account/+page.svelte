@@ -139,6 +139,12 @@
 				{/if}
 			</section>
 
+			<section class="space-y-4">
+				<h2 class="text-xl font-semibold">Credit Usage</h2>
+				<p class="text-gray-600">Monitor your credit balance and view transaction history.</p>
+				<a href="/credits" class="btn btn-secondary w-full">View details</a>
+			</section>
+
 			<!-- Billing History -->
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Billing History</h2>
@@ -250,12 +256,12 @@
 				</p>
 				<a href="/contact" class="btn btn-outline w-full">Provide Feedback</a>
 			</section>
-		</div>
 
-		<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
-			<div>
-				<button class="button block" disabled={loading}>Delete My Account</button>
-			</div>
-		</form>
+			<form method="post" action="?/delete" use:enhance={handleAccountDeletion}>
+				<div>
+					<button class="btn btn-error w-full" disabled={loading}>Delete My Account</button>
+				</div>
+			</form>
+		</div>
 	</div>
 </div>
