@@ -1,6 +1,10 @@
 import { createLogger, transports, format } from 'winston';
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
-import { VITE_AXIOM_DATASET, VITE_AXIOM_TOKEN } from '$env/static/private';
+import {
+	VITE_AXIOM_DATASET,
+	VITE_AXIOM_TOKEN,
+	VITE_LOGGER_SERVICE_NAME
+} from '$env/static/private';
 
 const axiomTransport = new AxiomTransport({
 	dataset: VITE_AXIOM_DATASET,
@@ -9,7 +13,7 @@ const axiomTransport = new AxiomTransport({
 
 const logger = createLogger({
 	level: 'info',
-	defaultMeta: { service: 'example-site' }, // Change this so you can identify your website if you have multiple logging into Axiom
+	defaultMeta: { service: VITE_LOGGER_SERVICE_NAME }, // Change this so you can identify your website if you have multiple logging into Axiom
 	format: format.combine(
 		format.errors({ stack: true }), // Captures error stack traces
 		format.timestamp(),
