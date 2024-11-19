@@ -2,7 +2,7 @@
 	import { type NavLinkItem } from '$lib/types/Nav/NavLinkItem';
 	import type { Session } from '@supabase/supabase-js';
 	import NavLinkParent from './NavLinkParent.svelte';
-	import type SupabaseClient from '@supabase/supabase-js/dist/module/SupabaseClient';
+	import { type SupabaseClient } from '@supabase/supabase-js';
 	import NavLink from './NavLink.svelte';
 
 	export let session: Session | null;
