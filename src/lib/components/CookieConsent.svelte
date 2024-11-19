@@ -9,12 +9,12 @@
 	onMount(() => {
 		if (!cookiesAccepted) {
 			const storedValue = localStorage.getItem('cookiesAccepted');
-			showBanner = storedValue !== 'true';
+			showBanner = storedValue === null;
 		}
 	});
 
-	const acceptCookies = () => {
-		localStorage.setItem('cookiesAccepted', 'true');
+	const handleCookiesSubmit = (accepted: boolean) => {
+		localStorage.setItem('cookiesAccepted', accepted.toString());
 		showBanner = false;
 	};
 </script>
@@ -30,8 +30,11 @@
 				>Privacy Policy</a
 			>.
 		</p>
-		<button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded" on:click={acceptCookies}
+		<button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded" on:click={() => handleCookiesSubmit(true)}
 			>Accept</button
+		>
+		<button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded" on:click={() => handleCookiesSubmit(false)}
+			>Reject</button
 		>
 	</div>
 {/if}
