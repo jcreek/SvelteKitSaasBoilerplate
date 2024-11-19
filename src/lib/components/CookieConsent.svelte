@@ -9,7 +9,7 @@
 	onMount(() => {
 		if (!cookiesAccepted) {
 			const storedValue = localStorage.getItem('cookiesAccepted');
-			showBanner = storedValue !== 'true';
+			showBanner = storedValue === null;
 		}
 	});
 
