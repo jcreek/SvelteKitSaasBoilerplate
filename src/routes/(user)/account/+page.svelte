@@ -5,8 +5,8 @@
 	export let data;
 	export let form;
 
-	let { session, user, subscriptions, transactions } = data;
-	$: ({ session, supabase, user } = data);
+	let { session, user, subscriptions, transactions, firstTransactionId, hasMoreThanOnePage } = data;
+	$: ({ session, user, transactions, firstTransactionId, hasMoreThanOnePage } = data);
 
 	let profileForm: HTMLFormElement;
 	let loading = false;
@@ -36,6 +36,22 @@
 		}
 
 		return async () => {
+			loading = false;
+		};
+	};
+
+	let startingAfter: string | undefined = undefined;
+	let endingBefore: string | undefined = undefined;
+	let hasNextPage = hasMoreThanOnePage;
+	let hasPreviousPage = false;
+
+	const handlePaginationSubmit: SubmitFunction = () => {
+		loading = true;
+
+		return async ({ result }) => {
+			transactions = JSON.parse(result.data.transactions);
+			hasNextPage = result.data.hasNextPage;
+			hasPreviousPage = !result.data.isFirstPage;
 			loading = false;
 		};
 	};
@@ -132,8 +148,9 @@
 			<!-- Billing History -->
 			<section class="space-y-4">
 				<h2 class="text-xl font-semibold">Billing History</h2>
-				<ul class="space-y-3">
-					{#if transactions}
+
+				{#if transactions && transactions.length > 0}
+					<ul class="space-y-3">
 						{#each transactions as transaction}
 							<li class="flex justify-between p-4 border border-gray-200 rounded-md">
 								<div>
@@ -152,8 +169,58 @@
 								{/if}
 							</li>
 						{/each}
-					{/if}
-				</ul>
+					</ul>
+				{:else}
+					<p class="text-gray-600">No transactions found.</p>
+				{/if}
+
+				<!-- Pagination Form -->
+				<form method="post" action="?/paginate" use:enhance={handlePaginationSubmit}>
+					<div
+						class="flex justify-center items-center space-x-2 mt-4"
+						role="navigation"
+						aria-label="Transactions pagination"
+					>
+						<input type="hidden" name="startingAfter" value={startingAfter} />
+						<input type="hidden" name="endingBefore" value={endingBefore} />
+						<input type="hidden" name="firstTransactionId" value={firstTransactionId} />
+						<input type="hidden" name="hasMoreThanOnePage" value={hasMoreThanOnePage} />
+
+						<button
+							type="submit"
+							name="direction"
+							value="previous"
+							class="btn btn-outline"
+							disabled={!hasPreviousPage || loading}
+							aria-label="View previous page of transactions"
+							on:click={() => {
+								if (transactions.length) {
+									endingBefore = transactions[0].id;
+									startingAfter = undefined;
+								}
+							}}
+						>
+							Previous
+						</button>
+
+						<button
+							type="submit"
+							name="direction"
+							value="next"
+							class="btn btn-outline"
+							disabled={!hasNextPage || loading}
+							aria-label="View next page of transactions"
+							on:click={() => {
+								if (transactions.length) {
+									startingAfter = transactions[transactions.length - 1].id;
+									endingBefore = undefined;
+								}
+							}}
+						>
+							Next
+						</button>
+					</div>
+				</form>
 			</section>
 		</div>
 

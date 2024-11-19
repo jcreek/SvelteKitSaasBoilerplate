@@ -612,7 +612,12 @@ const getUserSubscriptions = async (userId: string) => {
 	}
 };
 
-const getUserTransactions = async (userId: string) => {
+const getUserTransactions = async (
+	userId: string,
+	perPage: number,
+	startingAfter: string | undefined = undefined,
+	endingBefore: string | undefined = undefined
+) => {
 	try {
 		// Step 1: Retrieve the customer ID associated with the user
 		const { data, error } = await supabaseAdmin
@@ -632,10 +637,21 @@ const getUserTransactions = async (userId: string) => {
 		}
 
 		// Step 2: Fetch charge transactions from Stripe
-		const charges = await stripeClient.charges.list({ customer: customerId });
+		const params: stripe.ChargeListParams = {
+			customer: customerId,
+			limit: perPage
+		};
+
+		if (startingAfter) params.starting_after = startingAfter;
+		if (endingBefore) params.ending_before = endingBefore;
+
+		const charges = await stripeClient.charges.list(params);
+
+		const hasNextPage = charges.has_more;
 
 		// Step 3: Format transaction data
 		const transactions = charges.data.map((charge) => ({
+			id: charge.id,
 			amount: (charge.amount / 100).toFixed(2),
 			currency: charge.currency.toUpperCase(),
 			description: charge.description ?? 'No description provided',
@@ -648,7 +664,7 @@ const getUserTransactions = async (userId: string) => {
 			receipt_url: charge.receipt_url
 		}));
 
-		return transactions;
+		return { transactions, hasNextPage };
 	} catch (error) {
 		console.error('An error occurred while retrieving transactions:', error);
 		throw new Error('Could not retrieve transactions');
